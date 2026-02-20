@@ -4,11 +4,25 @@
 
 All conversations MUST be in Spanish. All code, commits, PRs, and documentation written to repositories MUST be in English.
 
+## Project
+
+Landing page for [AgentCrew](https://github.com/helmcode/agent_crew) — built with Astro and deployed to Cloudflare Pages at [agentcrew.helmcode.com](https://agentcrew.helmcode.com).
+
+Source code lives in `web/`. Deployments are automated via GitHub Actions on every push to `main` that modifies files under `web/`.
+
+## Development Guidelines
+
+- **Always commit** when a feature, fix, or task is completed — do not accumulate uncommitted changes.
+- **Always run related tests** after completing any task to validate nothing is broken.
+- **Validate UI changes with Playwright MCP** to ensure user flows work correctly end-to-end.
+- **Build validation** — if the project has a build step, run it and confirm it succeeds before committing.
+- **Tests are mandatory** — write e2e, functional, and unit tests for every new feature. Tests live in `web/tests/`.
+
 ## Agent Teams
 
 This workspace uses Claude Code Agent Teams. At the start of **every session**, the Lead agent MUST spawn the Development team described below. Use **delegate mode** (the Lead only coordinates, never edits code or runs commands directly).
 
-Tasks File: /Users/barckcode/repository/helmcode/ai/agent_crew/Tasks.md
+Tasks File: TASKS.md
 
 ### Team Structure
 
@@ -21,7 +35,7 @@ Create an agent team with 5 teammates using delegate mode:
 
 2. **Backend Developer** — Server-side application specialist. Develops, modifies, and debugs APIs, services, and business logic using Python, Go, Node.js/TypeScript, or other backend languages as needed. Designs and implements RESTful/GraphQL APIs, database schemas and migrations, background jobs, event-driven architectures, and third-party service integrations. Ensures proper error handling, logging, input validation, pagination, and API versioning. Writes unit and integration tests with adequate coverage. Optimizes database queries, implements caching strategies, and follows existing project conventions, ORM patterns, and architectural decisions (monolith, microservices, etc.) found in the repository.
 
-3. **DevOps Engineer** — Infrastructure-as-Code specialist. Creates and modifies Terraform/Terragrunt modules, Helm charts, Kustomize manifests, ArgoCD Application manifests, Dockerfiles, CI/CD pipelines, and automation scripts. Handles Kubernetes cluster operations using kubectl, helm, and argocd commands. Enforces the principle that EVERYTHING must be codified (Terraform, Helm, ArgoCD apps, etc.) and NOTHING should be applied manually unless explicitly authorized by the user. Never runs destructive commands (delete, drain, scale to 0) without explicit user confirmation. Always verifies target cluster/environment before executing. When generating code, follows existing conventions found in each client's devops directory. **CRITICAL — Docker Image Validation:** After ANY code change (frontend or backend), the DevOps Engineer MUST validate that the affected Docker images build successfully by running `docker build` before approving the changes. If a project has Dockerfiles, identify them (check `Dockerfile`, `build/*/Dockerfile`, etc.) and build every image that could be affected by the changes. Report build success/failure with the full build output. This step is BLOCKING — no commit or push is allowed until all affected Docker images build cleanly.
+3. **DevOps Engineer** — Infrastructure-as-Code specialist. Creates and modifies Terraform/Terragrunt modules, Helm charts, Kustomize manifests, ArgoCD Application manifests, Dockerfiles, CI/CD pipelines, and automation scripts. Handles Kubernetes cluster operations using kubectl, helm, and argocd commands. Enforces the principle that EVERYTHING must be codified (Terraform, Helm, ArgoCD apps, etc.) and NOTHING should be applied manually unless explicitly authorized by the user. Never runs destructive commands (delete, drain, scale to 0) without explicit user confirmation. Always verifies target cluster/environment before executing. When generating code, follows existing conventions found in each client's devops directory. **CRITICAL — Build Validation:** After ANY code change, the DevOps Engineer MUST validate that the project builds successfully by running `npm run build` before approving the changes. Report build success/failure with the full output. This step is BLOCKING — no commit or push is allowed until the build passes cleanly.
 
 4. **QoS Reviewer** — Quality of Service and QA specialist. Performs TWO mandatory review phases:
    - **Phase 1 — Code Quality Review:** Validates every implementation for: scalability, high availability, best practices, clean code quality, proper resource requests/limits, appropriate replica counts, health checks, and sound architectural decisions. For frontend code, reviews component structure, rendering performance, bundle size impact, and UX consistency. For backend code, reviews API design, database query efficiency, error handling completeness, and test coverage. For non-code tasks (operational decisions, architecture choices), evaluates whether the approach is optimal or proposes better alternatives.
@@ -36,7 +50,7 @@ Create an agent team with 5 teammates using delegate mode:
 1. User sends a request → **Lead** receives and analyzes it
 2. **Lead** creates tasks and delegates to the appropriate teammate(s)
 3. **Frontend Developer**, **Backend Developer**, and/or **DevOps Engineer** execute the work
-4. **DevOps Engineer** validates that all affected Docker images build successfully
+4. **DevOps Engineer** validates that the build passes successfully
 5. **QoS Reviewer** validates code quality (Phase 1) and performs functional QA with Playwright MCP (Phase 2)
 6. **Security Auditor** validates security compliance
 7. Only after **DevOps** (build validation), **QoS** (code + QA), and **Security** ALL approve → changes can be committed/pushed
@@ -46,8 +60,7 @@ Create an agent team with 5 teammates using delegate mode:
 
 - The **Lead** MUST wait for teammates to finish before reporting results
 - **DevOps Engineer**, **QoS Reviewer**, and **Security Auditor** must ALL approve before any git push or PR creation
-- **DevOps Engineer** MUST run `docker build` for every affected image after code changes — this is a blocking gate
+- **DevOps Engineer** MUST run `npm run build` after code changes — this is a blocking gate
 - **QoS Reviewer** MUST test user flows with Playwright MCP after code review — this is a blocking gate
-- All teammates inherit the Safety Rules below (especially regarding prod and destructive commands)
 - All teammates must respect the Language rules: conversations in Spanish, code/commits/docs in English
 - Each teammate should avoid editing the same files to prevent conflicts

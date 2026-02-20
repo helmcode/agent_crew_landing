@@ -9,6 +9,9 @@ web/test-results/
 web/playwright-report/
 web/.playwright/
 
+# Claude Code
+.claude/
+
 # Misc
 *.png
 .DS_Store
