@@ -1,43 +1,54 @@
-# Astro Starter Kit: Minimal
+# AgentCrew Landing Page
 
-```sh
-npm create astro@latest -- --template minimal
+Static landing page for [AgentCrew](https://github.com/helmcode/agent_crew) — a platform to build, deploy, and monitor collaborative AI agent teams powered by Claude Code.
+
+**Live site:** [agentcrew.helmcode.com](https://agentcrew.helmcode.com)
+
+## Tech Stack
+
+- [Astro v5](https://astro.build) — static site generator
+- [Tailwind CSS v4](https://tailwindcss.com) — utility-first CSS
+- [Playwright](https://playwright.dev) — end-to-end testing
+- [Cloudflare Pages](https://pages.cloudflare.com) — hosting & CDN
+
+## Getting Started
+
+```bash
+npm install
+npm run dev       # http://localhost:4321
+npm run build     # build to dist/
+npm run preview   # preview production build
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## Testing
 
-## 🚀 Project Structure
+```bash
+npm run test:e2e  # run Playwright e2e tests
+```
 
-Inside of your Astro project, you'll see the following folders and files:
+## Deployment
 
-```text
-/
-├── public/
+Deployments are automated via GitHub Actions on every push to `main` that modifies files under `web/`.
+
+Required secret: `CLOUDFLARE_API_TOKEN` (set in GitHub repository secrets).
+
+See [DEPLOYMENT.md](../DEPLOYMENT.md) for manual deployment steps.
+
+## Project Structure
+
+```
+web/
 ├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
+│   ├── components/     # Astro components (Navbar, Hero, Features, etc.)
+│   ├── layouts/        # Base layout with SEO meta tags
+│   ├── pages/          # index.astro
+│   └── styles/         # global.css (Tailwind + custom properties)
+├── public/             # Static assets
+├── tests/e2e/          # Playwright tests
+├── astro.config.mjs
+└── wrangler.toml       # Cloudflare Pages config
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+---
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
-
-Any static assets, like images, can be placed in the `public/` directory.
-
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+Built by [Helmcode](https://helmcode.com)
