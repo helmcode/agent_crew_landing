@@ -1,0 +1,86 @@
+---
+const features = [
+  {
+    icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="9" r="3"/><circle cx="19" cy="9" r="3"/><circle cx="12" cy="4" r="3"/><path d="M5 12v3M19 12v3M12 7v3"/><circle cx="5" cy="18" r="3"/><circle cx="12" cy="18" r="3"/><circle cx="19" cy="18" r="3"/></svg>`,
+    iconColor: '#60a5fa',
+    iconBg: 'rgba(59, 130, 246, 0.15)',
+    iconBorder: 'rgba(59, 130, 246, 0.3)',
+    hoverBorder: 'rgba(59, 130, 246, 0.5)',
+    title: 'Create Teams',
+    description: 'Configure teams of specialized agents with custom roles, instructions, and permissions through an intuitive wizard.',
+  },
+  {
+    icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>`,
+    iconColor: '#a78bfa',
+    iconBg: 'rgba(139, 92, 246, 0.15)',
+    iconBorder: 'rgba(139, 92, 246, 0.3)',
+    hoverBorder: 'rgba(139, 92, 246, 0.5)',
+    title: 'Deploy Instantly',
+    description: 'Launch agent containers on Docker or Kubernetes with a single click. Infrastructure is provisioned automatically.',
+  },
+  {
+    icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>`,
+    iconColor: '#34d399',
+    iconBg: 'rgba(52, 211, 153, 0.15)',
+    iconBorder: 'rgba(52, 211, 153, 0.3)',
+    hoverBorder: 'rgba(52, 211, 153, 0.5)',
+    title: 'Monitor in Real-Time',
+    description: 'Watch your agents work via live logs, WebSocket streams, and a real-time chat interface.',
+  },
+  {
+    icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
+    iconColor: '#fb923c',
+    iconBg: 'rgba(251, 146, 60, 0.15)',
+    iconBorder: 'rgba(251, 146, 60, 0.3)',
+    hoverBorder: 'rgba(251, 146, 60, 0.5)',
+    title: 'Leader + Workers',
+    description: 'Define a leader agent that coordinates tasks and worker agents that execute them in parallel.',
+  },
+];
+---
+
+<section id="features" class="py-24 sm:py-32" style="background: linear-gradient(180deg, #0a0f1e 0%, #0f172a 50%, #0a0f1e 100%);">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Header -->
+    <div class="text-center mb-16">
+      <span class="text-xs font-semibold tracking-widest uppercase text-blue-400 mb-4 block">Capabilities</span>
+      <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
+        Everything you need to build<br/>
+        <span class="gradient-text">autonomous AI workflows</span>
+      </h2>
+      <p class="text-lg text-slate-400 max-w-2xl mx-auto">
+        From team creation to production deployment — AgentCrew handles the orchestration so you can focus on results.
+      </p>
+    </div>
+
+    <!-- Features Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      {features.map((feature) => (
+        <div
+          class="group relative p-8 rounded-2xl border border-slate-800 bg-slate-900/50 hover:bg-slate-900 transition-all duration-300 overflow-hidden"
+          style={`--hover-border: ${feature.hoverBorder};`}
+        >
+          <!-- Hover border effect via pseudo-element workaround -->
+          <div class="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" style={`border: 1px solid ${feature.hoverBorder};`}></div>
+
+          <!-- Subtle background glow on hover -->
+          <div class="absolute -top-8 -right-8 w-32 h-32 rounded-full opacity-0 group-hover:opacity-30 transition-opacity duration-300 blur-2xl pointer-events-none" style={`background-color: ${feature.iconColor};`}></div>
+
+          <div class="relative z-10">
+            <!-- Icon -->
+            <div
+              class="w-14 h-14 rounded-xl flex items-center justify-center mb-5"
+              style={`background: ${feature.iconBg}; border: 1px solid ${feature.iconBorder}; color: ${feature.iconColor};`}
+            >
+              <Fragment set:html={feature.icon} />
+            </div>
+
+            <!-- Content -->
+            <h3 class="text-white font-bold text-xl mb-3">{feature.title}</h3>
+            <p class="text-slate-400 leading-relaxed">{feature.description}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

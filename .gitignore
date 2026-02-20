@@ -1,0 +1,18 @@
+# Dependencies
+web/node_modules/
+
+# Build output
+web/dist/
+
+# Playwright
+web/test-results/
+web/playwright-report/
+web/.playwright/
+
+# Misc
+*.png
+.DS_Store
+*.log
+
+# Cloudflare
+.wrangler/
