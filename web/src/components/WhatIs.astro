@@ -10,7 +10,7 @@
         What is <span class="gradient-text">AgentCrew</span>?
       </h2>
       <p class="text-lg text-slate-400 max-w-3xl mx-auto leading-relaxed">
-        AgentCrew is an open-source platform that lets you create teams of AI agents powered by Claude Code. Each agent runs in its own container, has a specialized role, and collaborates through a message bus — enabling complex, autonomous workflows.
+        AgentCrew is an open-source AI agent orchestrator. Just as Kubernetes orchestrates containers regardless of the application inside, AgentCrew orchestrates AI agents regardless of their purpose. Define your team, describe their roles in plain text, deploy, and let them collaborate autonomously.
       </p>
     </div>
 
@@ -29,9 +29,9 @@
             <circle cx="19" cy="18" r="3"/>
           </svg>
         </div>
-        <h3 class="text-white font-semibold text-lg mb-2">Multi-Agent Teams</h3>
+        <h3 class="text-white font-semibold text-lg mb-2">Purpose-Agnostic</h3>
         <p class="text-slate-400 text-sm leading-relaxed">
-          Spin up entire teams of AI agents, each with a distinct role — leader, developer, reviewer, or any specialty you define.
+          Build teams for software engineering, marketing, finance, research, operations, or any domain. Agent specialization is driven by documentation, not code.
         </p>
       </div>
 
@@ -39,12 +39,15 @@
       <div class="group p-6 rounded-xl border border-slate-800 bg-slate-900/60 hover:border-violet-500/40 hover:bg-slate-900 transition-all duration-300">
         <div class="w-12 h-12 rounded-lg flex items-center justify-center mb-4" style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(139, 92, 246, 0.05)); border: 1px solid rgba(139, 92, 246, 0.3);">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
           </svg>
         </div>
-        <h3 class="text-white font-semibold text-lg mb-2">Real-time Communication</h3>
+        <h3 class="text-white font-semibold text-lg mb-2">Documentation-Driven</h3>
         <p class="text-slate-400 text-sm leading-relaxed">
-          Agents communicate through a NATS message bus. Watch live logs, WebSocket streams, and agent interactions in real time.
+          Agents are defined by Markdown files with instructions, roles, and skills. Write what an agent should do, and it becomes that specialist. No code required.
         </p>
       </div>
 

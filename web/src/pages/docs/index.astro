@@ -7,37 +7,59 @@ import DocsLayout from '../../layouts/DocsLayout.astro';
     <h1>Documentation</h1>
 
     <p>
-      AgentCrew is a multi-agent AI team orchestrator powered by Claude Code.
-      It lets you define teams of specialized AI agents that collaborate to
-      accomplish complex tasks — from writing code and reviewing pull requests
-      to managing infrastructure and running security audits.
+      AgentCrew is an open-source AI agent orchestrator. Just as Kubernetes
+      orchestrates containers regardless of what application runs inside,
+      AgentCrew orchestrates AI agents regardless of their purpose.
     </p>
 
     <p>
-      Instead of chatting with a single AI assistant, AgentCrew lets you spin
-      up an entire team where each agent has a distinct role, custom
-      instructions, and specialized skills. A leader agent coordinates the
-      work and delegates tasks to worker agents automatically.
+      Create teams of specialized agents for any domain — software engineering,
+      marketing, finance, data analysis, content creation, operations, or
+      anything else. Agent specialization is driven entirely by documentation:
+      write Markdown instructions describing what each agent should do, and
+      AgentCrew handles deployment, communication, and coordination.
+    </p>
+
+    <p>
+      Currently powered by Claude Code, with support for additional AI
+      providers and models planned.
     </p>
 
     <h2>Key Concepts</h2>
 
     <h3>Teams</h3>
     <p>
-      A team is a group of AI agents that work together. Each team runs in its
-      own isolated environment (Docker containers with a dedicated NATS
-      messaging bus). You can have multiple teams running simultaneously, each
-      focused on a different project or task.
+      A team is a group of AI agents that work together on a shared mission.
+      Each team runs in its own isolated environment (Docker containers with a
+      dedicated NATS messaging bus). You can have multiple teams running
+      simultaneously, each focused on a different project or domain.
     </p>
 
     <h3>Agents: Leader + Workers</h3>
     <p>
       Every team has exactly one <strong>leader</strong> and one or more
       <strong>workers</strong>. The leader receives your messages, breaks down
-      the work, and delegates to workers. Workers are specialized agents — for
-      example, a "Frontend Developer", a "Backend Developer", or a "Security
-      Auditor". Workers are defined as Markdown files and spawned by Claude
-      Code as sub-agents.
+      the work, and delegates to workers. Workers are specialist agents defined
+      by Markdown files — their role, instructions, and behavior are entirely
+      determined by the documentation you write. A worker can be anything: a
+      "Content Strategist", a "Financial Analyst", a "Backend Developer", or a
+      "Legal Reviewer". The same orchestration platform, infinite use cases.
+    </p>
+
+    <h3>Documentation-Driven Specialization</h3>
+    <p>
+      The core of AgentCrew is that agents are defined by text. The system
+      generates structured files that determine each agent's behavior:
+    </p>
+    <ul>
+      <li><strong>CLAUDE.md</strong> — The leader's instructions, team context, and delegation protocol.</li>
+      <li><strong>agents/*.md</strong> — One file per worker, with YAML frontmatter (name, model, skills) and a Markdown body containing detailed instructions.</li>
+      <li><strong>Skills</strong> — Installable extensions from GitHub repos that give agents additional capabilities.</li>
+    </ul>
+    <p>
+      This documentation-driven approach means you can create agents for any
+      purpose without writing a single line of code. Describe what the agent
+      should do, and it becomes that specialist.
     </p>
 
     <h3>Skills</h3>
@@ -53,7 +75,7 @@ import DocsLayout from '../../layouts/DocsLayout.astro';
     <p>
       A workspace is a directory mounted into the agent container at
       <code>/workspace</code>. It gives agents access to your project files —
-      source code, configuration, documentation — so they can read, edit, and
+      source code, documents, data, configuration — so they can read, edit, and
       create files on your behalf. Workspaces persist across sessions.
     </p>
 
@@ -62,7 +84,7 @@ import DocsLayout from '../../layouts/DocsLayout.astro';
     <ul>
       <li>
         <a href="/docs/quick-start"><strong>Quick Start</strong></a> —
-        Get AgentCrew running in under 5 minutes with Docker Compose.
+        Get AgentCrew running in one command with Docker Compose.
       </li>
       <li>
         <a href="/docs/configuration"><strong>Configuration</strong></a> —
