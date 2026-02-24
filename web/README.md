@@ -61,4 +61,4 @@ Required secret: `CLOUDFLARE_API_TOKEN` (set in GitHub repository secrets).
 
 ---
 
-Open source. MIT License. Built by [Helmcode](https://helmcode.com).
+Open source. [AGPL-3.0 License](LICENSE). Built by [Helmcode](https://helmcode.com).
