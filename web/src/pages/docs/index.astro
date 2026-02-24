@@ -2,7 +2,7 @@
 import DocsLayout from '../../layouts/DocsLayout.astro';
 ---
 
-<DocsLayout title="Documentation — AgentCrew">
+<DocsLayout title="Documentation | AgentCrew">
   <div class="docs-prose">
     <h1>Documentation</h1>
 
@@ -13,7 +13,7 @@ import DocsLayout from '../../layouts/DocsLayout.astro';
     </p>
 
     <p>
-      Create teams of specialized agents for any domain — software engineering,
+      Create teams of specialized agents for any domain: software engineering,
       marketing, finance, data analysis, content creation, operations, or
       anything else. Agent specialization is driven entirely by documentation:
       write Markdown instructions describing what each agent should do, and
@@ -40,7 +40,7 @@ import DocsLayout from '../../layouts/DocsLayout.astro';
       Every team has exactly one <strong>leader</strong> and one or more
       <strong>workers</strong>. The leader receives your messages, breaks down
       the work, and delegates to workers. Workers are specialist agents defined
-      by Markdown files — their role, instructions, and behavior are entirely
+      by Markdown files. Their role, instructions, and behavior are entirely
       determined by the documentation you write. A worker can be anything: a
       "Content Strategist", a "Financial Analyst", a "Backend Developer", or a
       "Legal Reviewer". The same orchestration platform, infinite use cases.
@@ -52,9 +52,9 @@ import DocsLayout from '../../layouts/DocsLayout.astro';
       generates structured files that determine each agent's behavior:
     </p>
     <ul>
-      <li><strong>CLAUDE.md</strong> — The leader's instructions, team context, and delegation protocol.</li>
-      <li><strong>agents/*.md</strong> — One file per worker, with YAML frontmatter (name, model, skills) and a Markdown body containing detailed instructions.</li>
-      <li><strong>Skills</strong> — Installable extensions from GitHub repos that give agents additional capabilities.</li>
+      <li><strong>CLAUDE.md</strong>: The leader's instructions, team context, and delegation protocol.</li>
+      <li><strong>agents/*.md</strong>: One file per worker, with YAML frontmatter (name, model, skills) and a Markdown body containing detailed instructions.</li>
+      <li><strong>Skills</strong>: Installable extensions from GitHub repos that give agents additional capabilities.</li>
     </ul>
     <p>
       This documentation-driven approach means you can create agents for any
@@ -74,8 +74,8 @@ import DocsLayout from '../../layouts/DocsLayout.astro';
     <h3>Workspaces</h3>
     <p>
       A workspace is a directory mounted into the agent container at
-      <code>/workspace</code>. It gives agents access to your project files —
-      source code, documents, data, configuration — so they can read, edit, and
+      <code>/workspace</code>. It gives agents access to your project files,
+      including source code, documents, data, and configuration, so they can read, edit, and
       create files on your behalf. Workspaces persist across sessions.
     </p>
 
@@ -83,19 +83,19 @@ import DocsLayout from '../../layouts/DocsLayout.astro';
 
     <ul>
       <li>
-        <a href="/docs/quick-start"><strong>Quick Start</strong></a> —
+        <a href="/docs/quick-start"><strong>Quick Start</strong></a>:
         Get AgentCrew running in one command with Docker Compose.
       </li>
       <li>
-        <a href="/docs/configuration"><strong>Configuration</strong></a> —
+        <a href="/docs/configuration"><strong>Configuration</strong></a>:
         Environment variables, application settings, and storage options.
       </li>
       <li>
-        <a href="/docs/skills"><strong>Skills</strong></a> —
+        <a href="/docs/skills"><strong>Skills</strong></a>:
         How to extend agent capabilities with installable skills.
       </li>
       <li>
-        <a href="/docs/architecture"><strong>Architecture</strong></a> —
+        <a href="/docs/architecture"><strong>Architecture</strong></a>:
         System components, messaging, container internals, and runtime design.
       </li>
     </ul>

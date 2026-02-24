@@ -2,7 +2,7 @@
 import DocsLayout from '../../layouts/DocsLayout.astro';
 ---
 
-<DocsLayout title="Architecture — AgentCrew">
+<DocsLayout title="Architecture | AgentCrew">
   <div class="docs-prose">
     <h1>Architecture</h1>
 
@@ -70,7 +70,7 @@ import DocsLayout from '../../layouts/DocsLayout.astro';
     <ul>
       <li>REST API endpoints for CRUD operations on teams, agents, and skills.</li>
       <li>Application settings management (API keys, configuration).</li>
-      <li>Docker runtime management — creating networks, volumes, and containers for each team.</li>
+      <li>Docker runtime management, including creating networks, volumes, and containers for each team.</li>
       <li>NATS message routing between the frontend and agent containers.</li>
       <li>SQLite database access for persistent storage.</li>
     </ul>
@@ -114,8 +114,8 @@ import DocsLayout from '../../layouts/DocsLayout.astro';
     </ol>
 
     <p>
-      This design keeps Claude Code unaware of the messaging infrastructure —
-      it simply reads from stdin and writes to stdout, while the sidecar
+      This design keeps Claude Code unaware of the messaging infrastructure.
+      It simply reads from stdin and writes to stdout, while the sidecar
       handles all network communication.
     </p>
 
@@ -179,7 +179,7 @@ import DocsLayout from '../../layouts/DocsLayout.astro';
     </p>
 
     <p>
-      This design keeps resource usage efficient — only one container per team,
+      This design keeps resource usage efficient. Only one container runs per team,
       regardless of how many workers are defined.
     </p>
 
@@ -230,10 +230,10 @@ import DocsLayout from '../../layouts/DocsLayout.astro';
     </p>
 
     <ul>
-      <li><strong>Namespace per team</strong> — Isolation between teams using Kubernetes namespaces.</li>
-      <li><strong>PersistentVolumeClaims</strong> — For workspace storage and database persistence.</li>
-      <li><strong>Pods</strong> — NATS and agent containers running as pods with appropriate resource limits.</li>
-      <li><strong>Services</strong> — Internal networking between NATS and agent pods.</li>
+      <li><strong>Namespace per team</strong>: Isolation between teams using Kubernetes namespaces.</li>
+      <li><strong>PersistentVolumeClaims</strong>: For workspace storage and database persistence.</li>
+      <li><strong>Pods</strong>: NATS and agent containers running as pods with appropriate resource limits.</li>
+      <li><strong>Services</strong>: Internal networking between NATS and agent pods.</li>
     </ul>
 
     <p>
@@ -264,15 +264,15 @@ import DocsLayout from '../../layouts/DocsLayout.astro';
 
     <ul>
       <li>
-        <a href="/docs/skills">Skills</a> — Understand how skills extend agent
+        <a href="/docs/skills">Skills</a>: Understand how skills extend agent
         capabilities and integrate into the container.
       </li>
       <li>
-        <a href="/docs/configuration">Configuration</a> — Review all
+        <a href="/docs/configuration">Configuration</a>: Review all
         configuration options for customizing your deployment.
       </li>
       <li>
-        <a href="/docs/quick-start">Quick Start</a> — Get AgentCrew running
+        <a href="/docs/quick-start">Quick Start</a>: Get AgentCrew running
         locally in under 5 minutes.
       </li>
     </ul>

@@ -2,7 +2,7 @@
 import DocsLayout from '../../layouts/DocsLayout.astro';
 ---
 
-<DocsLayout title="Configuration — AgentCrew">
+<DocsLayout title="Configuration | AgentCrew">
   <div class="docs-prose">
     <h1>Configuration</h1>
 
@@ -33,7 +33,7 @@ import DocsLayout from '../../layouts/DocsLayout.astro';
         <tr>
           <td><code>NATS_AUTH_TOKEN</code></td>
           <td>Yes</td>
-          <td>—</td>
+          <td>None</td>
           <td>Authentication token for NATS messaging between the API server and agent containers. Must be a secure, random string.</td>
         </tr>
         <tr>
@@ -104,8 +104,8 @@ AGENT_IMAGE=ghcr.io/helmcode/agent_crew_agent:0.1.1</code></pre>
     <h2>Workspace Path</h2>
 
     <p>
-      When creating a team, you can specify a <strong>workspace path</strong>
-      — a directory on your host machine that will be mounted into the agent
+      When creating a team, you can specify a <strong>workspace path</strong>,
+      a directory on your host machine that will be mounted into the agent
       container at <code>/workspace</code>. This gives agents read and write
       access to your project files.
     </p>
@@ -144,11 +144,11 @@ AGENT_IMAGE=ghcr.io/helmcode/agent_crew_agent:0.1.1</code></pre>
 
     <ul>
       <li>
-        <a href="/docs/skills">Skills</a> — Extend agent capabilities with
+        <a href="/docs/skills">Skills</a>: Extend agent capabilities with
         installable skills from GitHub.
       </li>
       <li>
-        <a href="/docs/architecture">Architecture</a> — Understand how
+        <a href="/docs/architecture">Architecture</a>: Understand how
         components interact and where data flows.
       </li>
     </ul>
