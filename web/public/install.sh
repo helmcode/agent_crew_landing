@@ -77,11 +77,11 @@ gather_config() {
   echo ""
 
   while true; do
-    read -rp "Choose an option [1/2/3]: " choice
+    read -rp "Choose an option [1/2/3]: " choice </dev/tty
     case "$choice" in
       1)
         echo ""
-        read -rp "Enter your Anthropic API key: " AUTH_VALUE
+        read -rp "Enter your Anthropic API key: " AUTH_VALUE </dev/tty
         if [[ -z "$AUTH_VALUE" ]]; then
           warn "Empty value. Skipping — you can set it later in Settings."
         else
@@ -92,7 +92,7 @@ gather_config() {
         ;;
       2)
         echo ""
-        read -rp "Enter your Claude Code OAuth token: " AUTH_VALUE
+        read -rp "Enter your Claude Code OAuth token: " AUTH_VALUE </dev/tty
         if [[ -z "$AUTH_VALUE" ]]; then
           warn "Empty value. Skipping — you can set it later in Settings."
         else
@@ -113,10 +113,10 @@ gather_config() {
 
   # Ports
   echo ""
-  read -rp "Frontend port [8080]: " FRONTEND_PORT
+  read -rp "Frontend port [8080]: " FRONTEND_PORT </dev/tty
   FRONTEND_PORT="${FRONTEND_PORT:-8080}"
 
-  read -rp "API port [3000]: " API_PORT
+  read -rp "API port [3000]: " API_PORT </dev/tty
   API_PORT="${API_PORT:-3000}"
 }
 
@@ -128,7 +128,7 @@ install() {
   # Create install directory
   if [[ -d "$INSTALL_DIR" ]]; then
     warn "Directory '$INSTALL_DIR' already exists."
-    read -rp "Overwrite configuration? [y/N]: " overwrite
+    read -rp "Overwrite configuration? [y/N]: " overwrite </dev/tty
     if [[ "${overwrite,,}" != "y" ]]; then
       fail "Installation cancelled."
     fi
