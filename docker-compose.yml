@@ -5,7 +5,7 @@ services:
     command: ["--auth", "${NATS_AUTH_TOKEN}", "-m", "8222"]
 
   api:
-    image: ghcr.io/helmcode/agent_crew_api:0.2.0
+    image: ghcr.io/helmcode/agent_crew_api:0.1.1
     restart: unless-stopped
     user: root
     ports:
@@ -16,7 +16,7 @@ services:
       - NATS_URL=nats://nats:4222
       - NATS_AUTH_TOKEN=${NATS_AUTH_TOKEN}
       - DATABASE_PATH=/data/agentcrew.db
-      - AGENT_IMAGE=${AGENT_IMAGE:-ghcr.io/helmcode/agent_crew_agent:0.2.0}
+      - AGENT_IMAGE=${AGENT_IMAGE:-ghcr.io/helmcode/agent_crew_agent:0.1.1}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - agentcrew_db:/data
