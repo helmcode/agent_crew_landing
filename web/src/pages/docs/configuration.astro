@@ -1,0 +1,156 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+---
+
+<DocsLayout title="Configuration — AgentCrew">
+  <div class="docs-prose">
+    <h1>Configuration</h1>
+
+    <p>
+      AgentCrew is configured through environment variables (set in your
+      <code>.env</code> file) and application settings (managed via the UI).
+      This page documents every available option.
+    </p>
+
+    <h2>Environment Variables</h2>
+
+    <p>
+      These variables are defined in the <code>.env</code> file at the root of
+      your AgentCrew installation. They are read when the Docker Compose stack
+      starts.
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Variable</th>
+          <th>Required</th>
+          <th>Default</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>NATS_AUTH_TOKEN</code></td>
+          <td>Yes</td>
+          <td>—</td>
+          <td>Authentication token for NATS messaging between the API server and agent containers. Must be a secure, random string.</td>
+        </tr>
+        <tr>
+          <td><code>API_PORT</code></td>
+          <td>No</td>
+          <td><code>3000</code></td>
+          <td>Port on which the API server listens. Change this if port 3000 is already in use.</td>
+        </tr>
+        <tr>
+          <td><code>FRONTEND_PORT</code></td>
+          <td>No</td>
+          <td><code>8080</code></td>
+          <td>Port on which the frontend is served. Change this if port 8080 is already in use.</td>
+        </tr>
+        <tr>
+          <td><code>AGENT_IMAGE</code></td>
+          <td>No</td>
+          <td><code>ghcr.io/helmcode/agentcrew-agent:0.1.0</code></td>
+          <td>Docker image used for agent containers. Override this to use a custom or newer agent image.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Example .env file</h3>
+
+    <pre><code class="language-bash"># Required
+NATS_AUTH_TOKEN=a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6
+
+# Optional overrides
+API_PORT=3000
+FRONTEND_PORT=8080
+AGENT_IMAGE=ghcr.io/helmcode/agentcrew-agent:0.1.0</code></pre>
+
+    <h2>Application Settings</h2>
+
+    <p>
+      These settings are configured through the <strong>Settings</strong> page
+      in the AgentCrew UI (click the gear icon in the sidebar). They are stored
+      in the application database and can be changed at any time without
+      restarting.
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Setting</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>ANTHROPIC_API_KEY</code></td>
+          <td>Your Anthropic API key for Claude Code. Obtain one from <a href="https://console.anthropic.com/" target="_blank" rel="noopener">console.anthropic.com</a>. Required unless you use an OAuth token instead.</td>
+        </tr>
+        <tr>
+          <td><code>CLAUDE_CODE_OAUTH_TOKEN</code></td>
+          <td>Alternative authentication method: an OAuth token for Claude Code. Use this if you prefer OAuth over API key authentication. Only one of the two is required.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <blockquote>
+      <strong>Note:</strong> You must provide either <code>ANTHROPIC_API_KEY</code>
+      or <code>CLAUDE_CODE_OAUTH_TOKEN</code>. If both are set, the API key
+      takes precedence.
+    </blockquote>
+
+    <h2>Workspace Path</h2>
+
+    <p>
+      When creating a team, you can specify a <strong>workspace path</strong>
+      — a directory on your host machine that will be mounted into the agent
+      container at <code>/workspace</code>. This gives agents read and write
+      access to your project files.
+    </p>
+
+    <ul>
+      <li>The path must be an <strong>absolute path</strong> on the host (e.g., <code>/home/user/projects/my-app</code>).</li>
+      <li>The directory must exist before the team is created.</li>
+      <li>Agents can read, create, edit, and delete files within the workspace.</li>
+      <li>If no workspace path is specified, agents work with an empty <code>/workspace</code> directory backed by a Docker volume.</li>
+    </ul>
+
+    <pre><code class="language-text"># Host machine                    # Inside agent container
+/home/user/projects/my-app  →    /workspace</code></pre>
+
+    <h2>Persistent Storage</h2>
+
+    <p>
+      AgentCrew uses a SQLite database to store teams, agents, skills, chat
+      history, and application settings. The database file is persisted in a
+      Docker volume named <code>agentcrew_db</code>.
+    </p>
+
+    <ul>
+      <li>The volume is created automatically on first run.</li>
+      <li>Data survives <code>docker compose down</code> and <code>docker compose up</code> cycles.</li>
+      <li>To fully reset, remove the volume: <code>docker volume rm agentcrew_db</code>.</li>
+    </ul>
+
+    <blockquote>
+      <strong>Tip:</strong> Back up your database by copying it from the
+      volume. Use <code>docker cp</code> or mount the volume to a temporary
+      container to access the SQLite file.
+    </blockquote>
+
+    <h2>Next Steps</h2>
+
+    <ul>
+      <li>
+        <a href="/docs/skills">Skills</a> — Extend agent capabilities with
+        installable skills from GitHub.
+      </li>
+      <li>
+        <a href="/docs/architecture">Architecture</a> — Understand how
+        components interact and where data flows.
+      </li>
+    </ul>
+  </div>
+</DocsLayout>

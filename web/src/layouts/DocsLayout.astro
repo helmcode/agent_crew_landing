@@ -1,0 +1,205 @@
+---
+import '../styles/global.css';
+import Navbar from '../components/Navbar.astro';
+
+export interface Props {
+  title?: string;
+  description?: string;
+  canonicalURL?: string;
+}
+
+const {
+  title = 'Docs — AgentCrew',
+  description = 'AgentCrew documentation. Learn how to build, deploy and orchestrate collaborative AI agent teams.',
+  canonicalURL = Astro.url.href,
+} = Astro.props;
+
+const currentPath = Astro.url.pathname;
+
+interface NavItem {
+  href: string;
+  label: string;
+}
+
+interface NavSection {
+  title: string;
+  items: NavItem[];
+}
+
+const sidebarSections: NavSection[] = [
+  {
+    title: 'Getting Started',
+    items: [
+      { href: '/docs', label: 'Overview' },
+      { href: '/docs/quick-start', label: 'Quick Start' },
+      { href: '/docs/configuration', label: 'Configuration' },
+    ],
+  },
+  {
+    title: 'Core Concepts',
+    items: [
+      { href: '/docs/skills', label: 'Skills' },
+      { href: '/docs/architecture', label: 'Architecture' },
+    ],
+  },
+];
+
+function isActive(href: string): boolean {
+  if (href === '/docs') {
+    return currentPath === '/docs' || currentPath === '/docs/';
+  }
+  return currentPath.startsWith(href);
+}
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <meta name="generator" content={Astro.generator} />
+    <link rel="canonical" href={canonicalURL} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:site_name" content="AgentCrew" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title}</title>
+  </head>
+  <body>
+    <Navbar />
+
+    <!-- Mobile sidebar toggle -->
+    <button
+      id="docs-sidebar-toggle"
+      class="fixed top-20 left-4 z-40 md:hidden flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-300 transition-colors duration-200 border border-brand-border"
+      style="background-color: rgba(15, 23, 42, 0.95);"
+      aria-label="Toggle documentation sidebar"
+    >
+      <svg id="sidebar-icon-open" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <line x1="3" y1="6" x2="21" y2="6"/>
+        <line x1="3" y1="12" x2="21" y2="12"/>
+        <line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+      <svg id="sidebar-icon-close" class="hidden" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <line x1="18" y1="6" x2="6" y2="18"/>
+        <line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+      <span id="sidebar-toggle-label">Menu</span>
+    </button>
+
+    <!-- Sidebar overlay (mobile) -->
+    <div
+      id="docs-sidebar-overlay"
+      class="fixed inset-0 z-30 hidden md:hidden"
+      style="background-color: rgba(0, 0, 0, 0.6);"
+    ></div>
+
+    <div class="flex pt-16">
+      <!-- Sidebar -->
+      <aside
+        id="docs-sidebar"
+        class="fixed top-16 left-0 z-30 h-[calc(100vh-4rem)] w-64 overflow-y-auto border-r border-brand-border -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out"
+        style="background-color: #0c1222;"
+      >
+        <nav class="px-4 py-6 space-y-6">
+          {sidebarSections.map((section) => (
+            <div>
+              <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-3 px-2">
+                {section.title}
+              </h3>
+              <ul class="space-y-1">
+                {section.items.map((item) => (
+                  <li>
+                    <a
+                      href={item.href}
+                      class:list={[
+                        'block px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200',
+                        isActive(item.href)
+                          ? 'bg-blue-600/15 text-blue-400 border-l-2 border-blue-400'
+                          : 'text-slate-400 hover:text-white hover:bg-slate-800/50',
+                      ]}
+                    >
+                      {item.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </nav>
+      </aside>
+
+      <!-- Main content -->
+      <main class="flex-1 md:ml-64 min-h-[calc(100vh-4rem)]">
+        <div class="max-w-4xl mx-auto px-6 py-12 md:px-12 lg:px-16">
+          <article class="docs-prose">
+            <slot />
+          </article>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      const toggle = document.getElementById('docs-sidebar-toggle');
+      const sidebar = document.getElementById('docs-sidebar');
+      const overlay = document.getElementById('docs-sidebar-overlay');
+      const iconOpen = document.getElementById('sidebar-icon-open');
+      const iconClose = document.getElementById('sidebar-icon-close');
+      const toggleLabel = document.getElementById('sidebar-toggle-label');
+
+      let isOpen = false;
+
+      function openSidebar() {
+        isOpen = true;
+        sidebar?.classList.remove('-translate-x-full');
+        sidebar?.classList.add('translate-x-0');
+        overlay?.classList.remove('hidden');
+        iconOpen?.classList.add('hidden');
+        iconClose?.classList.remove('hidden');
+        if (toggleLabel) toggleLabel.textContent = 'Close';
+      }
+
+      function closeSidebar() {
+        isOpen = false;
+        sidebar?.classList.add('-translate-x-full');
+        sidebar?.classList.remove('translate-x-0');
+        overlay?.classList.add('hidden');
+        iconOpen?.classList.remove('hidden');
+        iconClose?.classList.add('hidden');
+        if (toggleLabel) toggleLabel.textContent = 'Menu';
+      }
+
+      toggle?.addEventListener('click', () => {
+        if (isOpen) {
+          closeSidebar();
+        } else {
+          openSidebar();
+        }
+      });
+
+      overlay?.addEventListener('click', closeSidebar);
+
+      // Close sidebar when clicking a link (mobile)
+      sidebar?.querySelectorAll('a').forEach((link) => {
+        link.addEventListener('click', () => {
+          if (window.innerWidth < 768) {
+            closeSidebar();
+          }
+        });
+      });
+
+      // Close sidebar on resize to desktop
+      window.addEventListener('resize', () => {
+        if (window.innerWidth >= 768 && isOpen) {
+          closeSidebar();
+        }
+      });
+    </script>
+  </body>
+</html>

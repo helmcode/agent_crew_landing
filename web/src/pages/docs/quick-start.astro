@@ -1,0 +1,149 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+---
+
+<DocsLayout title="Quick Start — AgentCrew">
+  <div class="docs-prose">
+    <h1>Quick Start</h1>
+
+    <p>
+      Get AgentCrew running locally in under 5 minutes. All you need is Docker
+      and Docker Compose.
+    </p>
+
+    <h2>Prerequisites</h2>
+
+    <ul>
+      <li><a href="https://docs.docker.com/get-docker/" target="_blank" rel="noopener">Docker</a> installed and running</li>
+      <li><a href="https://docs.docker.com/compose/install/" target="_blank" rel="noopener">Docker Compose</a> v2 or later</li>
+      <li>An <a href="https://console.anthropic.com/" target="_blank" rel="noopener">Anthropic API key</a> (you will add this in Step 5)</li>
+    </ul>
+
+    <h2>Step 1: Download the Compose File</h2>
+
+    <p>
+      Create a directory for AgentCrew and download the required files from the
+      repository:
+    </p>
+
+    <pre><code class="language-bash">mkdir agentcrew && cd agentcrew
+
+# Download docker-compose.yml
+curl -fsSL -o docker-compose.yml \
+  https://raw.githubusercontent.com/helmcode/agent_crew/main/docker-compose.yml
+
+# Download the example environment file
+curl -fsSL -o .env.example \
+  https://raw.githubusercontent.com/helmcode/agent_crew/main/.env.example</code></pre>
+
+    <h2>Step 2: Configure Environment Variables</h2>
+
+    <p>
+      Copy the example environment file and set your NATS authentication token:
+    </p>
+
+    <pre><code class="language-bash"># Copy the example file
+cp .env.example .env
+
+# Generate a random token and set it (or use your own)
+sed -i'' -e "s/NATS_AUTH_TOKEN=.*/NATS_AUTH_TOKEN=$(openssl rand -hex 16)/" .env</code></pre>
+
+    <p>
+      Alternatively, open <code>.env</code> in your editor and set
+      <code>NATS_AUTH_TOKEN</code> to any secure string of your choice.
+    </p>
+
+    <blockquote>
+      <strong>Tip:</strong> The NATS token is used for internal communication
+      between the API server and agent containers. It does not leave your
+      machine.
+    </blockquote>
+
+    <h2>Step 3: Start AgentCrew</h2>
+
+    <p>Launch all services with a single command:</p>
+
+    <pre><code class="language-bash">docker compose up -d</code></pre>
+
+    <p>
+      This starts the API server, the frontend, and sets up the required Docker
+      networks and volumes. You should see output similar to:
+    </p>
+
+    <pre><code class="language-text">✔ Network agentcrew_default  Created
+✔ Volume "agentcrew_db"      Created
+✔ Container agentcrew-api    Started
+✔ Container agentcrew-web    Started</code></pre>
+
+    <h2>Step 4: Open the UI</h2>
+
+    <p>
+      Open your browser and navigate to:
+    </p>
+
+    <pre><code class="language-text">http://localhost:8080</code></pre>
+
+    <p>
+      You should see the AgentCrew interface with an empty team list.
+    </p>
+
+    <h2>Step 5: Add Your Anthropic API Key</h2>
+
+    <ol>
+      <li>Click the <strong>Settings</strong> icon (gear) in the sidebar.</li>
+      <li>In the Settings modal, find the <strong>ANTHROPIC_API_KEY</strong> field.</li>
+      <li>Paste your Anthropic API key and click <strong>Save</strong>.</li>
+    </ol>
+
+    <blockquote>
+      <strong>Note:</strong> If you prefer to use an OAuth token instead, fill
+      in the <strong>CLAUDE_CODE_OAUTH_TOKEN</strong> field and leave the API
+      key blank. Only one is required.
+    </blockquote>
+
+    <h2>Step 6: Create Your First Team</h2>
+
+    <ol>
+      <li>Click <strong>New Team</strong> to open the team creation wizard.</li>
+      <li>
+        <strong>Step 1 — Team Details:</strong> Give your team a name (e.g.,
+        "My Dev Team"), add a description, and optionally set a workspace path
+        if you want agents to access local files.
+      </li>
+      <li>
+        <strong>Step 2 — Agents:</strong> Configure the leader agent with
+        custom instructions, then add one or more worker agents. Each worker
+        gets a name, role, and instructions. You can also attach skills to any
+        agent in this step.
+      </li>
+      <li>
+        <strong>Step 3 — Review:</strong> Review your team configuration and
+        click <strong>Create</strong>.
+      </li>
+    </ol>
+
+    <p>
+      Once created, your team will start provisioning. When the status shows
+      <strong>running</strong>, click on the team to open the chat. Type a
+      message and the leader will coordinate with the workers to accomplish
+      your request.
+    </p>
+
+    <h2>Next Steps</h2>
+
+    <ul>
+      <li>
+        <a href="/docs/configuration">Configuration</a> — Learn about all
+        available environment variables and settings.
+      </li>
+      <li>
+        <a href="/docs/skills">Skills</a> — Extend your agents with
+        specialized capabilities.
+      </li>
+      <li>
+        <a href="/docs/architecture">Architecture</a> — Understand how the
+        system works under the hood.
+      </li>
+    </ul>
+  </div>
+</DocsLayout>

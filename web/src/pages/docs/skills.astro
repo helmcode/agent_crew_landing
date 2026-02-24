@@ -1,0 +1,174 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+---
+
+<DocsLayout title="Skills — AgentCrew">
+  <div class="docs-prose">
+    <h1>Skills</h1>
+
+    <p>
+      Skills are extensions that give agents specialized capabilities sourced
+      from GitHub repositories. They let you expand what your agents can do
+      without modifying their core instructions — from interacting with
+      external APIs to following project-specific coding standards.
+    </p>
+
+    <h2>How Skills Work</h2>
+
+    <p>
+      Under the hood, skills are installed using the Claude Code skills CLI:
+    </p>
+
+    <pre><code class="language-bash">npx skills add &lt;github_repo_url&gt; --skill &lt;skill_name&gt; --agent claude-code -y</code></pre>
+
+    <p>
+      This command fetches the skill definition from a GitHub repository and
+      installs it into the agent's environment. Once installed, the skill
+      becomes part of the agent's available capabilities and Claude Code can
+      use it automatically when relevant.
+    </p>
+
+    <h2>Types of Skills</h2>
+
+    <h3>Agent Skills (Worker-Specific)</h3>
+
+    <p>
+      Agent skills are installed on a specific worker and are only available to
+      that worker. Use these when a capability is relevant to just one role.
+    </p>
+
+    <p>
+      For example, you might install a Kubernetes skill only on your "DevOps
+      Engineer" worker, or a React testing skill only on your "Frontend
+      Developer" worker.
+    </p>
+
+    <h3>Global Skills (Leader)</h3>
+
+    <p>
+      Global skills are installed on the <strong>leader</strong> agent and are
+      automatically shared with <strong>all agents</strong> in the team. They
+      appear in every worker's configuration, making them available across the
+      entire team.
+    </p>
+
+    <p>
+      Use global skills for capabilities that every agent should have — such as
+      project conventions, documentation standards, or shared tooling
+      integrations.
+    </p>
+
+    <blockquote>
+      <strong>Tip:</strong> In the UI, the leader agent is labeled with
+      <strong>"(global)"</strong> to indicate that skills installed on it are
+      shared with all team members.
+    </blockquote>
+
+    <h2>Adding Skills During Team Creation</h2>
+
+    <p>
+      When creating a new team, you can attach skills in <strong>Step 2</strong>
+      of the creation wizard:
+    </p>
+
+    <ol>
+      <li>
+        <strong>Leader skills (global):</strong> In the leader configuration
+        section, add skills by providing the GitHub repository URL and skill
+        name. These will be available to all agents.
+      </li>
+      <li>
+        <strong>Worker skills:</strong> In each worker's configuration section,
+        add skills specific to that worker's role. These will only be available
+        to that particular worker.
+      </li>
+    </ol>
+
+    <p>
+      Each skill entry requires:
+    </p>
+
+    <ul>
+      <li><strong>Repository URL</strong> — The GitHub repository containing the skill (e.g., <code>https://github.com/anthropics/skills</code>)</li>
+      <li><strong>Skill name</strong> — The name of the skill within that repository (e.g., <code>create-react-app</code>)</li>
+    </ul>
+
+    <h2>Adding Skills to Running Teams</h2>
+
+    <p>
+      You can also add skills to teams that are already running:
+    </p>
+
+    <ol>
+      <li>Open the team's chat view.</li>
+      <li>Click the <strong>Settings</strong> icon to open the team settings modal.</li>
+      <li>Select any agent from the list:
+        <ul>
+          <li>Select the <strong>leader (global)</strong> to add skills shared with all agents.</li>
+          <li>Select a specific <strong>worker</strong> to add skills only for that worker.</li>
+        </ul>
+      </li>
+      <li>Add the new skill with its repository URL and skill name.</li>
+      <li>Save the changes. The skill will be installed on the next agent restart.</li>
+    </ol>
+
+    <h2>Storage and Discovery</h2>
+
+    <p>
+      Skills are organized in two directories inside the agent container:
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Directory</th>
+          <th>Purpose</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>.agents/skills/</code></td>
+          <td>Contains the actual skill files downloaded from GitHub repositories.</td>
+        </tr>
+        <tr>
+          <td><code>.claude/skills/</code></td>
+          <td>Contains symlinks pointing to <code>.agents/skills/</code>. This is how Claude Code discovers and loads installed skills.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+      This two-directory structure separates skill storage from skill
+      discovery. The <code>.agents/skills/</code> directory holds the source of
+      truth, while <code>.claude/skills/</code> provides the interface that
+      Claude Code expects.
+    </p>
+
+    <pre><code class="language-text">/workspace/
+  .agents/
+    skills/
+      create-react-app/      # Actual skill files
+      kubernetes-ops/         # Actual skill files
+  .claude/
+    skills/
+      create-react-app → ../../.agents/skills/create-react-app   # Symlink
+      kubernetes-ops   → ../../.agents/skills/kubernetes-ops      # Symlink
+    agents/
+      frontend-dev.md        # Worker agent definition
+      devops-engineer.md     # Worker agent definition
+    CLAUDE.md                # Leader instructions</code></pre>
+
+    <h2>Next Steps</h2>
+
+    <ul>
+      <li>
+        <a href="/docs/architecture">Architecture</a> — Learn how agent
+        containers are structured and how skills fit into the runtime.
+      </li>
+      <li>
+        <a href="/docs/configuration">Configuration</a> — Review all
+        available settings for customizing your setup.
+      </li>
+    </ul>
+  </div>
+</DocsLayout>

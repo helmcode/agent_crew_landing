@@ -1,0 +1,81 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+---
+
+<DocsLayout title="Documentation — AgentCrew">
+  <div class="docs-prose">
+    <h1>Documentation</h1>
+
+    <p>
+      AgentCrew is a multi-agent AI team orchestrator powered by Claude Code.
+      It lets you define teams of specialized AI agents that collaborate to
+      accomplish complex tasks — from writing code and reviewing pull requests
+      to managing infrastructure and running security audits.
+    </p>
+
+    <p>
+      Instead of chatting with a single AI assistant, AgentCrew lets you spin
+      up an entire team where each agent has a distinct role, custom
+      instructions, and specialized skills. A leader agent coordinates the
+      work and delegates tasks to worker agents automatically.
+    </p>
+
+    <h2>Key Concepts</h2>
+
+    <h3>Teams</h3>
+    <p>
+      A team is a group of AI agents that work together. Each team runs in its
+      own isolated environment (Docker containers with a dedicated NATS
+      messaging bus). You can have multiple teams running simultaneously, each
+      focused on a different project or task.
+    </p>
+
+    <h3>Agents: Leader + Workers</h3>
+    <p>
+      Every team has exactly one <strong>leader</strong> and one or more
+      <strong>workers</strong>. The leader receives your messages, breaks down
+      the work, and delegates to workers. Workers are specialized agents — for
+      example, a "Frontend Developer", a "Backend Developer", or a "Security
+      Auditor". Workers are defined as Markdown files and spawned by Claude
+      Code as sub-agents.
+    </p>
+
+    <h3>Skills</h3>
+    <p>
+      Skills are extensions that give agents specialized capabilities sourced
+      from GitHub repositories. Skills can be installed on individual workers
+      (agent-specific) or on the leader (global, shared with all agents in the
+      team). They allow you to extend what your agents can do without modifying
+      their core instructions.
+    </p>
+
+    <h3>Workspaces</h3>
+    <p>
+      A workspace is a directory mounted into the agent container at
+      <code>/workspace</code>. It gives agents access to your project files —
+      source code, configuration, documentation — so they can read, edit, and
+      create files on your behalf. Workspaces persist across sessions.
+    </p>
+
+    <h2>Documentation Sections</h2>
+
+    <ul>
+      <li>
+        <a href="/docs/quick-start"><strong>Quick Start</strong></a> —
+        Get AgentCrew running in under 5 minutes with Docker Compose.
+      </li>
+      <li>
+        <a href="/docs/configuration"><strong>Configuration</strong></a> —
+        Environment variables, application settings, and storage options.
+      </li>
+      <li>
+        <a href="/docs/skills"><strong>Skills</strong></a> —
+        How to extend agent capabilities with installable skills.
+      </li>
+      <li>
+        <a href="/docs/architecture"><strong>Architecture</strong></a> —
+        System components, messaging, container internals, and runtime design.
+      </li>
+    </ul>
+  </div>
+</DocsLayout>
