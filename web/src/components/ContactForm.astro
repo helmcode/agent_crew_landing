@@ -5,6 +5,7 @@ import type { Lang } from '../i18n/ui';
 interface Props { lang?: Lang; }
 const lang = Astro.props.lang ?? 'en';
 const t = useTranslations(lang);
+const gradientText = t('contact.headingGradient');
 ---
 
 <section id="contact" class="py-24 sm:py-32" style="background: linear-gradient(180deg, #0a0f1e 0%, #0f172a 50%, #0a0f1e 100%);">
@@ -12,7 +13,7 @@ const t = useTranslations(lang);
     <div class="text-center mb-16">
       <span class="text-xs font-semibold tracking-widest uppercase text-blue-400 mb-4 block">{t('contact.label')}</span>
       <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
-        {t('contact.heading')} {t('contact.headingGradient') && <span class="gradient-text">{t('contact.headingGradient')}</span>}
+        {t('contact.heading')}{gradientText.length > 0 && <> <span class="gradient-text">{gradientText}</span></>}
       </h2>
       <p class="text-lg text-slate-400 max-w-2xl mx-auto">
         {t('contact.subtitle')}
@@ -21,13 +22,10 @@ const t = useTranslations(lang);
 
     <div class="max-w-2xl mx-auto rounded-2xl border border-slate-800 p-8 sm:p-10" style="background: linear-gradient(135deg, #0d1117, #111827);">
       <form
-        action="https://formsubmit.co/hello+agentcrew@helmcode.com"
-        method="POST"
+        id="contact-form"
         class="space-y-6"
       >
         <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
-        <input type="hidden" name="_captcha" value="false">
-        <input type="hidden" name="_next" value="https://agentcrew.helmcode.com/#contact">
 
         <div>
           <label for="name" class="block text-sm font-medium text-slate-300 mb-2">{t('contact.name')}</label>
@@ -82,16 +80,80 @@ const t = useTranslations(lang);
           ></textarea>
         </div>
 
-        <button
-          type="submit"
-          class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold px-8 py-3.5 rounded-lg transition-all duration-200 glow-blue text-base"
-        >
-          {t('contact.submit')}
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
-          </svg>
-        </button>
+        <div class="text-center">
+          <button
+            type="submit"
+            id="contact-submit"
+            class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold px-8 py-3.5 rounded-lg transition-all duration-200 glow-blue text-base"
+          >
+            {t('contact.submit')}
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+            </svg>
+          </button>
+        </div>
       </form>
+
+      <div id="contact-success" class="hidden text-center py-8">
+        <div class="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center" style="background-color: rgba(34, 197, 94, 0.15);">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 6L9 17l-5-5"/>
+          </svg>
+        </div>
+        <h3 class="text-xl font-bold text-white mb-2">{t('contact.successTitle')}</h3>
+        <p class="text-slate-400">{t('contact.successMessage')}</p>
+      </div>
+
+      <div id="contact-error" class="hidden text-center py-8">
+        <div class="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center" style="background-color: rgba(239, 68, 68, 0.15);">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </div>
+        <h3 class="text-xl font-bold text-white mb-2">{t('contact.errorTitle')}</h3>
+        <p class="text-slate-400">{t('contact.errorMessage')}</p>
+      </div>
     </div>
   </div>
 </section>
+
+<script>
+  const form = document.getElementById('contact-form') as HTMLFormElement;
+  const submitBtn = document.getElementById('contact-submit') as HTMLButtonElement;
+  const successDiv = document.getElementById('contact-success');
+  const errorDiv = document.getElementById('contact-error');
+
+  if (form) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const honey = (form.querySelector('[name="_honey"]') as HTMLInputElement)?.value;
+      if (honey) return;
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = '...';
+
+      const data = new FormData(form);
+      data.delete('_honey');
+
+      try {
+        const res = await fetch('https://formsubmit.co/ajax/hello+agentcrew@helmcode.com', {
+          method: 'POST',
+          headers: { 'Accept': 'application/json' },
+          body: data,
+        });
+
+        if (res.ok) {
+          form.classList.add('hidden');
+          successDiv?.classList.remove('hidden');
+        } else {
+          form.classList.add('hidden');
+          errorDiv?.classList.remove('hidden');
+        }
+      } catch {
+        form.classList.add('hidden');
+        errorDiv?.classList.remove('hidden');
+      }
+    });
+  }
+</script>

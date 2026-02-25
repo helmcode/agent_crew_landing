@@ -42,6 +42,10 @@ export const ui: Record<Lang, Record<string, string>> = {
     'contact.message': 'Message',
     'contact.messagePlaceholder': 'Tell us about your use case...',
     'contact.submit': 'Send Message',
+    'contact.successTitle': 'Message sent!',
+    'contact.successMessage': 'Thanks for reaching out. We will get back to you soon.',
+    'contact.errorTitle': 'Something went wrong',
+    'contact.errorMessage': 'Please try again or email us directly at hello+agentcrew@helmcode.com.',
 
     // Docs sidebar
     'docs.gettingStarted': 'Getting Started',
@@ -86,6 +90,10 @@ export const ui: Record<Lang, Record<string, string>> = {
     'contact.message': 'Mensaje',
     'contact.messagePlaceholder': 'Cuentanos sobre tu caso de uso...',
     'contact.submit': 'Enviar Mensaje',
+    'contact.successTitle': 'Mensaje enviado!',
+    'contact.successMessage': 'Gracias por escribirnos. Te responderemos pronto.',
+    'contact.errorTitle': 'Algo salio mal',
+    'contact.errorMessage': 'Por favor intenta de nuevo o escribenos a hello+agentcrew@helmcode.com.',
 
     // Docs sidebar
     'docs.gettingStarted': 'Primeros Pasos',
