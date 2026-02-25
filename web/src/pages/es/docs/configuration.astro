@@ -1,0 +1,156 @@
+---
+import DocsLayout from '../../../layouts/DocsLayout.astro';
+---
+
+<DocsLayout title="Configuracion | AgentCrew" lang="es">
+  <div class="docs-prose">
+    <h1>Configuracion</h1>
+
+    <p>
+      AgentCrew se configura a traves de variables de entorno (definidas en tu
+      archivo <code>.env</code>) y ajustes de la aplicacion (gestionados desde la interfaz).
+      Esta pagina documenta todas las opciones disponibles.
+    </p>
+
+    <h2>Variables de Entorno</h2>
+
+    <p>
+      Estas variables se definen en el archivo <code>.env</code> en la raiz de
+      tu instalacion de AgentCrew. Se leen cuando el stack de Docker Compose
+      se inicia.
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Variable</th>
+          <th>Requerida</th>
+          <th>Valor por Defecto</th>
+          <th>Descripcion</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>NATS_AUTH_TOKEN</code></td>
+          <td>Si</td>
+          <td>Ninguno</td>
+          <td>Token de autenticacion para la mensajeria NATS entre el servidor API y los contenedores de agentes. Debe ser una cadena aleatoria y segura.</td>
+        </tr>
+        <tr>
+          <td><code>API_PORT</code></td>
+          <td>No</td>
+          <td><code>3000</code></td>
+          <td>Puerto en el que escucha el servidor API. Cambialo si el puerto 3000 ya esta en uso.</td>
+        </tr>
+        <tr>
+          <td><code>FRONTEND_PORT</code></td>
+          <td>No</td>
+          <td><code>8080</code></td>
+          <td>Puerto en el que se sirve el frontend. Cambialo si el puerto 8080 ya esta en uso.</td>
+        </tr>
+        <tr>
+          <td><code>AGENT_IMAGE</code></td>
+          <td>No</td>
+          <td><code>ghcr.io/helmcode/agent_crew_agent:0.1.1</code></td>
+          <td>Imagen Docker utilizada para los contenedores de agentes. Sobreescribela para usar una imagen de agente personalizada o mas reciente.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Ejemplo de archivo .env</h3>
+
+    <pre><code class="language-bash"># Required
+NATS_AUTH_TOKEN=a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6
+
+# Optional overrides
+API_PORT=3000
+FRONTEND_PORT=8080
+AGENT_IMAGE=ghcr.io/helmcode/agent_crew_agent:0.1.1</code></pre>
+
+    <h2>Ajustes de la Aplicacion</h2>
+
+    <p>
+      Estos ajustes se configuran a traves de la pagina de <strong>Configuracion</strong>
+      en la interfaz de AgentCrew (haz clic en el icono de engranaje en la barra lateral). Se almacenan
+      en la base de datos de la aplicacion y pueden cambiarse en cualquier momento sin
+      reiniciar.
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Ajuste</th>
+          <th>Descripcion</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>ANTHROPIC_API_KEY</code></td>
+          <td>Tu clave API de Anthropic para Claude Code. Obten una en <a href="https://console.anthropic.com/" target="_blank" rel="noopener">console.anthropic.com</a>. Requerida a menos que uses un token OAuth en su lugar.</td>
+        </tr>
+        <tr>
+          <td><code>CLAUDE_CODE_OAUTH_TOKEN</code></td>
+          <td>Metodo de autenticacion alternativo: un token OAuth para Claude Code. Usalo si prefieres OAuth en lugar de autenticacion por clave API. Solo uno de los dos es requerido.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <blockquote>
+      <strong>Nota:</strong> Debes proporcionar <code>ANTHROPIC_API_KEY</code>
+      o <code>CLAUDE_CODE_OAUTH_TOKEN</code>. Si ambos estan configurados, la clave API
+      tiene precedencia.
+    </blockquote>
+
+    <h2>Ruta del Espacio de Trabajo</h2>
+
+    <p>
+      Al crear un equipo, puedes especificar una <strong>ruta de espacio de trabajo</strong>,
+      un directorio en tu maquina host que se montara en el contenedor del agente
+      en <code>/workspace</code>. Esto da a los agentes acceso de lectura y escritura
+      a los archivos de tu proyecto.
+    </p>
+
+    <ul>
+      <li>La ruta debe ser una <strong>ruta absoluta</strong> en el host (por ejemplo, <code>/home/user/projects/my-app</code>).</li>
+      <li>El directorio debe existir antes de crear el equipo.</li>
+      <li>Los agentes pueden leer, crear, editar y eliminar archivos dentro del espacio de trabajo.</li>
+      <li>Si no se especifica una ruta de espacio de trabajo, los agentes trabajan con un directorio <code>/workspace</code> vacio respaldado por un volumen Docker.</li>
+    </ul>
+
+    <pre><code class="language-text"># Host machine                    # Inside agent container
+/home/user/projects/my-app  →    /workspace</code></pre>
+
+    <h2>Almacenamiento Persistente</h2>
+
+    <p>
+      AgentCrew usa una base de datos SQLite para almacenar equipos, agentes, habilidades,
+      historial de chat y ajustes de la aplicacion. El archivo de base de datos se persiste en un
+      volumen Docker llamado <code>agentcrew_db</code>.
+    </p>
+
+    <ul>
+      <li>El volumen se crea automaticamente en la primera ejecucion.</li>
+      <li>Los datos sobreviven a ciclos de <code>docker compose down</code> y <code>docker compose up</code>.</li>
+      <li>Para reiniciar completamente, elimina el volumen: <code>docker volume rm agentcrew_db</code>.</li>
+    </ul>
+
+    <blockquote>
+      <strong>Consejo:</strong> Haz una copia de seguridad de tu base de datos copiandola desde el
+      volumen. Usa <code>docker cp</code> o monta el volumen en un contenedor temporal
+      para acceder al archivo SQLite.
+    </blockquote>
+
+    <h2>Siguientes Pasos</h2>
+
+    <ul>
+      <li>
+        <a href="/es/docs/skills">Habilidades</a>: Extiende las capacidades de los agentes con
+        habilidades instalables desde GitHub.
+      </li>
+      <li>
+        <a href="/es/docs/architecture">Arquitectura</a>: Entiende como
+        interactuan los componentes y por donde fluyen los datos.
+      </li>
+    </ul>
+  </div>
+</DocsLayout>

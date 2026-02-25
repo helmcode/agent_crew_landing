@@ -1,4 +1,11 @@
 ---
+import { useTranslations, getBaseUrl } from '../i18n/utils';
+import type { Lang } from '../i18n/ui';
+
+interface Props { lang?: Lang; }
+const lang = Astro.props.lang ?? 'en';
+const t = useTranslations(lang);
+const base = getBaseUrl(lang);
 ---
 
 <section class="py-24 sm:py-32 relative overflow-hidden" style="background: linear-gradient(180deg, #0a0f1e 0%, #0d1424 50%, #0a0f1e 100%);">
@@ -16,18 +23,18 @@
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
       </svg>
-      Ready to deploy
+      {t('cta.badge')}
     </div>
 
     <!-- Heading -->
     <h2 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white mb-5 leading-tight">
-      Build your first<br/>
-      <span class="gradient-text">agent team today</span>
+      {t('cta.heading')}<br/>
+      <span class="gradient-text">{t('cta.headingGradient')}</span>
     </h2>
 
     <!-- Subtitle -->
     <p class="text-lg text-slate-400 mb-10 max-w-xl mx-auto">
-      Open source, self-hosted, and running in one command. Define the mission, and AgentCrew handles the rest.
+      {t('cta.subtitle')}
     </p>
 
     <!-- Install command -->
@@ -37,13 +44,13 @@
       </div>
     </div>
 
-    <!-- CTA Button -->
-    <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+    <!-- CTA Buttons -->
+    <div class="flex flex-col sm:flex-row sm:flex-wrap items-center justify-center gap-4">
       <a
-        href="/docs/quick-start"
+        href={`${base}/docs/quick-start`}
         class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-bold px-10 py-4 rounded-xl transition-all duration-200 glow-blue text-base"
       >
-        Get Started
+        {t('cta.getStarted')}
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M5 12h14M12 5l7 7-7 7"/>
         </svg>
@@ -57,7 +64,22 @@
         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
           <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
         </svg>
-        View on GitHub
+        {t('cta.viewGithub')}
+      </a>
+      <a
+        href="https://calendly.com/helmcode/work"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 border border-violet-500/50 hover:border-violet-400 text-violet-300 hover:text-white font-bold px-10 py-4 rounded-xl transition-all duration-200 text-base"
+        style="background: rgba(139, 92, 246, 0.08);"
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+          <line x1="16" y1="2" x2="16" y2="6"/>
+          <line x1="8" y1="2" x2="8" y2="6"/>
+          <line x1="3" y1="10" x2="21" y2="10"/>
+        </svg>
+        {t('cta.bookCall')}
       </a>
     </div>
 
@@ -67,20 +89,20 @@
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
           <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
         </svg>
-        Self-hosted
+        {t('cta.selfHosted')}
       </div>
       <div class="flex items-center gap-2 text-slate-500 text-sm">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
         </svg>
-        No data sent to us
+        {t('cta.noData')}
       </div>
       <div class="flex items-center gap-2 text-slate-500 text-sm">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
           <circle cx="12" cy="12" r="10"/>
           <path d="M8 12l2 2 4-4"/>
         </svg>
-        AGPL-3.0 License
+        {t('cta.license')}
       </div>
     </div>
   </div>

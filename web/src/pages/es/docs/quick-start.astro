@@ -1,0 +1,142 @@
+---
+import DocsLayout from '../../../layouts/DocsLayout.astro';
+---
+
+<DocsLayout title="Inicio Rapido | AgentCrew" lang="es">
+  <div class="docs-prose">
+    <h1>Inicio Rapido</h1>
+
+    <p>
+      Pon AgentCrew en marcha localmente en menos de 5 minutos. Solo necesitas Docker
+      y Docker Compose.
+    </p>
+
+    <h2>Requisitos Previos</h2>
+
+    <ul>
+      <li><a href="https://docs.docker.com/get-docker/" target="_blank" rel="noopener">Docker</a> instalado y en ejecucion</li>
+      <li><a href="https://docs.docker.com/compose/install/" target="_blank" rel="noopener">Docker Compose</a> v2 o posterior</li>
+      <li>Una <a href="https://console.anthropic.com/" target="_blank" rel="noopener">clave API de Anthropic</a> o token OAuth de Claude Code</li>
+    </ul>
+
+    <h2>Instalacion en Una Linea</h2>
+
+    <p>
+      Ejecuta este unico comando para descargar, configurar e iniciar AgentCrew:
+    </p>
+
+    <pre><code class="language-bash">curl -fsSL https://agentcrew.helmcode.com/install.sh | bash</code></pre>
+
+    <p>
+      El instalador verificara que Docker esta disponible, generara toda la
+      configuracion necesaria e iniciara el stack automaticamente.
+    </p>
+
+    <p>
+      Una vez que termine, abre <a href="http://localhost:8080">http://localhost:8080</a>
+      para acceder a la interfaz de AgentCrew.
+    </p>
+
+    <h2>Instalacion Manual</h2>
+
+    <p>
+      Si prefieres configurar las cosas manualmente, sigue estos pasos:
+    </p>
+
+    <h3>Paso 1: Descarga el Archivo Compose</h3>
+
+    <p>
+      Crea un directorio para AgentCrew y descarga los archivos necesarios:
+    </p>
+
+    <pre><code class="language-bash">mkdir agentcrew && cd agentcrew
+
+# Descargar docker-compose.yml
+curl -fsSL -o docker-compose.yml \
+  https://raw.githubusercontent.com/helmcode/agent_crew_landing/main/docker-compose.yml</code></pre>
+
+    <h3>Paso 2: Configura las Variables de Entorno</h3>
+
+    <p>
+      Crea un archivo <code>.env</code> con un token NATS seguro:
+    </p>
+
+    <pre><code class="language-bash"># Generar .env con un token NATS aleatorio
+echo "NATS_AUTH_TOKEN=$(openssl rand -hex 16)" > .env</code></pre>
+
+    <p>
+      Tambien puedes establecer puertos personalizados agregando <code>API_PORT</code> y
+      <code>FRONTEND_PORT</code> al archivo <code>.env</code>.
+    </p>
+
+    <h3>Paso 3: Inicia AgentCrew</h3>
+
+    <pre><code class="language-bash">docker compose up -d</code></pre>
+
+    <h3>Paso 4: Abre la Interfaz</h3>
+
+    <p>
+      Abre tu navegador y navega a:
+    </p>
+
+    <pre><code class="language-text">http://localhost:8080</code></pre>
+
+    <h3>Paso 5: Agrega tus Credenciales</h3>
+
+    <ol>
+      <li>Haz clic en el icono de <strong>Configuracion</strong> (engranaje) en la barra lateral.</li>
+      <li>Ingresa tu <strong>ANTHROPIC_API_KEY</strong> o <strong>CLAUDE_CODE_OAUTH_TOKEN</strong>.</li>
+      <li>Haz clic en <strong>Guardar</strong>.</li>
+    </ol>
+
+    <blockquote>
+      <strong>Nota:</strong> Solo se requiere una credencial. Si ambas estan configuradas,
+      la clave API tiene precedencia.
+    </blockquote>
+
+    <h2>Crea tu Primer Equipo</h2>
+
+    <ol>
+      <li>Haz clic en <strong>Nuevo Equipo</strong> para abrir el asistente de creacion.</li>
+      <li>
+        <strong>Paso 1: Detalles del Equipo:</strong> Dale un nombre a tu equipo (por ejemplo,
+        "Mi Equipo Dev"), agrega una descripcion y opcionalmente establece una ruta de espacio de trabajo
+        si quieres que los agentes accedan a archivos locales.
+      </li>
+      <li>
+        <strong>Paso 2: Agentes:</strong> Configura el agente lider con
+        instrucciones personalizadas, luego agrega uno o mas agentes trabajadores. Cada trabajador
+        obtiene un nombre, rol e instrucciones. Tambien puedes adjuntar habilidades a cualquier
+        agente en este paso.
+      </li>
+      <li>
+        <strong>Paso 3: Revision:</strong> Revisa la configuracion de tu equipo y
+        haz clic en <strong>Crear</strong>.
+      </li>
+    </ol>
+
+    <p>
+      Una vez creado, tu equipo comenzara a aprovisionarse. Cuando el estado muestre
+      <strong>running</strong>, haz clic en el equipo para abrir el chat. Escribe un
+      mensaje y el lider se coordinara con los trabajadores para cumplir
+      tu solicitud.
+    </p>
+
+    <h2>Siguientes Pasos</h2>
+
+    <ul>
+      <li>
+        <a href="/es/docs/configuration">Configuracion</a>: Conoce todas las
+        variables de entorno y ajustes disponibles.
+      </li>
+      <li>
+        <a href="/es/docs/skills">Habilidades</a>: Extiende tus agentes con
+        capacidades especializadas.
+      </li>
+      <li>
+        <a href="/es/docs/architecture">Arquitectura</a>: Entiende como funciona el
+        sistema internamente.
+      </li>
+    </ul>
+  </div>
+</DocsLayout>

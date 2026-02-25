@@ -1,0 +1,110 @@
+---
+import DocsLayout from '../../../layouts/DocsLayout.astro';
+---
+
+<DocsLayout title="Documentacion | AgentCrew" lang="es">
+  <div class="docs-prose">
+    <h1>Documentacion</h1>
+
+    <p>
+      AgentCrew es un orquestador de agentes IA de codigo abierto. Asi como Kubernetes
+      orquesta contenedores sin importar la aplicacion dentro,
+      AgentCrew orquesta agentes IA sin importar su proposito.
+    </p>
+
+    <p>
+      Crea equipos de agentes especializados para cualquier dominio: ingenieria de software,
+      marketing, finanzas, analisis de datos, creacion de contenido, operaciones o
+      cualquier otra cosa. La especializacion del agente esta dirigida completamente por la documentacion:
+      escribe instrucciones en Markdown describiendo lo que cada agente debe hacer, y
+      AgentCrew se encarga del despliegue, comunicacion y coordinacion.
+    </p>
+
+    <p>
+      Actualmente funciona con Claude Code, con soporte planificado para proveedores de IA
+      y modelos adicionales.
+    </p>
+
+    <h2>Conceptos Clave</h2>
+
+    <h3>Equipos</h3>
+    <p>
+      Un equipo es un grupo de agentes IA que trabajan juntos en una mision compartida.
+      Cada equipo se ejecuta en su propio entorno aislado (contenedores Docker con un
+      bus de mensajeria NATS dedicado). Puedes tener multiples equipos ejecutandose
+      simultaneamente, cada uno enfocado en un proyecto o dominio diferente.
+    </p>
+
+    <h3>Agentes: Lider + Trabajadores</h3>
+    <p>
+      Cada equipo tiene exactamente un <strong>lider</strong> y uno o mas
+      <strong>trabajadores</strong>. El lider recibe tus mensajes, desglosa
+      el trabajo y delega a los trabajadores. Los trabajadores son agentes especialistas definidos
+      por archivos Markdown. Su rol, instrucciones y comportamiento estan completamente
+      determinados por la documentacion que escribes. Un trabajador puede ser cualquier cosa: un
+      "Estratega de Contenido", un "Analista Financiero", un "Desarrollador Backend" o un
+      "Revisor Legal". La misma plataforma de orquestacion, infinitos casos de uso.
+    </p>
+
+    <h3>Especializacion Dirigida por Documentacion</h3>
+    <p>
+      El nucleo de AgentCrew es que los agentes se definen por texto. El sistema
+      genera archivos estructurados que determinan el comportamiento de cada agente:
+    </p>
+    <ul>
+      <li><strong>CLAUDE.md</strong>: Las instrucciones del lider, contexto del equipo y protocolo de delegacion.</li>
+      <li><strong>agents/*.md</strong>: Un archivo por trabajador, con frontmatter YAML (nombre, modelo, habilidades) y un cuerpo Markdown con instrucciones detalladas.</li>
+      <li><strong>Skills</strong>: Extensiones instalables desde repos de GitHub que dan a los agentes capacidades adicionales.</li>
+    </ul>
+    <p>
+      Este enfoque dirigido por documentacion significa que puedes crear agentes para cualquier
+      proposito sin escribir una sola linea de codigo. Describe lo que el agente
+      debe hacer, y se convierte en ese especialista.
+    </p>
+
+    <h3>Habilidades (Skills)</h3>
+    <p>
+      Las habilidades son extensiones que dan a los agentes capacidades especializadas obtenidas
+      de repositorios de GitHub. Las habilidades pueden instalarse en trabajadores individuales
+      (especificas del agente) o en el lider (globales, compartidas con todos los agentes del
+      equipo). Te permiten extender lo que tus agentes pueden hacer sin modificar
+      sus instrucciones base.
+    </p>
+
+    <h3>Espacios de Trabajo</h3>
+    <p>
+      Un espacio de trabajo es un directorio montado en el contenedor del agente en
+      <code>/workspace</code>. Da a los agentes acceso a los archivos de tu proyecto,
+      incluyendo codigo fuente, documentos, datos y configuracion, para que puedan leer, editar y
+      crear archivos en tu nombre. Los espacios de trabajo persisten entre sesiones.
+    </p>
+
+    <h2>Secciones de la Documentacion</h2>
+
+    <ul>
+      <li>
+        <a href="/es/docs/quick-start"><strong>Inicio Rapido</strong></a>:
+        Pon AgentCrew en marcha con un solo comando usando Docker Compose.
+      </li>
+      <li>
+        <a href="/es/docs/configuration"><strong>Configuracion</strong></a>:
+        Variables de entorno, ajustes de la aplicacion y opciones de almacenamiento.
+      </li>
+      <li>
+        <a href="/es/docs/skills"><strong>Habilidades</strong></a>:
+        Como extender las capacidades de los agentes con habilidades instalables.
+      </li>
+      <li>
+        <a href="/es/docs/architecture"><strong>Arquitectura</strong></a>:
+        Componentes del sistema, mensajeria, internos del contenedor y diseno del runtime.
+      </li>
+    </ul>
+
+    <h2>Licencia</h2>
+
+    <p>
+      AgentCrew es software de codigo abierto licenciado bajo la
+      <a href="https://github.com/helmcode/agent_crew_landing/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">GNU Affero General Public License v3.0 (AGPL-3.0)</a>.
+    </p>
+  </div>
+</DocsLayout>

@@ -1,0 +1,279 @@
+---
+import DocsLayout from '../../../layouts/DocsLayout.astro';
+---
+
+<DocsLayout title="Arquitectura | AgentCrew" lang="es">
+  <div class="docs-prose">
+    <h1>Arquitectura</h1>
+
+    <p>
+      AgentCrew esta compuesto por varios sistemas interconectados que trabajan
+      juntos para orquestar equipos de agentes IA multi-agente. Esta pagina describe cada
+      componente, como se comunican y como estan estructurados los entornos de ejecucion.
+    </p>
+
+    <h2>Vision General del Sistema</h2>
+
+    <p>
+      La arquitectura de alto nivel sigue un diseno dirigido por mensajes donde el
+      frontend, la API y los contenedores de agentes se comunican a traves de NATS:
+    </p>
+
+    <pre><code class="language-text">┌─────────────────────────────────────────────────────────────────┐
+│                        Host Machine                             │
+│                                                                 │
+│  ┌──────────────┐    ┌──────────────────┐    ┌───────────────┐  │
+│  │   Frontend    │    │    API Server     │    │     NATS      │  │
+│  │  (React SPA)  │───▶│   (Go / Fiber)   │───▶│   (Messaging) │  │
+│  │  :8080        │    │   :3000           │    │   :4222       │  │
+│  └──────────────┘    └──────────────────┘    └───────┬───────┘  │
+│                                                       │         │
+│                              ┌────────────────────────┘         │
+│                              ▼                                  │
+│                    ┌───────────────────┐                        │
+│                    │  Agent Container   │                        │
+│                    │  ┌─────────────┐  │                        │
+│                    │  │   Sidecar    │  │                        │
+│                    │  │  (NATS ↔    │  │                        │
+│                    │  │  stdin/out)  │  │                        │
+│                    │  └──────┬──────┘  │                        │
+│                    │         │         │                        │
+│                    │  ┌──────▼──────┐  │                        │
+│                    │  │ Claude Code  │  │                        │
+│                    │  │    CLI       │  │                        │
+│                    │  └─────────────┘  │                        │
+│                    │                   │                        │
+│                    │  /workspace ──────┼─── Host directory      │
+│                    └───────────────────┘    or Docker volume    │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘</code></pre>
+
+    <h2>Componentes</h2>
+
+    <h3>Frontend (React SPA)</h3>
+
+    <p>
+      El frontend es una aplicacion de pagina unica construida con React. Proporciona
+      la interfaz de usuario para gestionar equipos, configurar agentes, instalar
+      habilidades y chatear con equipos en tiempo real. Se comunica con el
+      servidor API a traves de endpoints HTTP y conexiones WebSocket para la
+      transmision de mensajes en vivo.
+    </p>
+
+    <h3>Servidor API (Go / Fiber)</h3>
+
+    <p>
+      El servidor API esta construido con Go usando el framework Fiber. Se encarga de:
+    </p>
+
+    <ul>
+      <li>Endpoints de API REST para operaciones CRUD en equipos, agentes y habilidades.</li>
+      <li>Gestion de ajustes de la aplicacion (claves API, configuracion).</li>
+      <li>Gestion del runtime de Docker, incluyendo la creacion de redes, volumenes y contenedores para cada equipo.</li>
+      <li>Enrutamiento de mensajes NATS entre el frontend y los contenedores de agentes.</li>
+      <li>Acceso a la base de datos SQLite para almacenamiento persistente.</li>
+    </ul>
+
+    <h3>NATS (Mensajeria)</h3>
+
+    <p>
+      NATS proporciona la capa de mensajeria en tiempo real. Cada equipo obtiene su propia
+      instancia de NATS ejecutandose en un contenedor. Los mensajes fluyen bidireccionalmente:
+    </p>
+
+    <ul>
+      <li><strong>Usuario → Agente:</strong> Los mensajes de chat se publican en NATS por el servidor API y son recibidos por el proceso sidecar del agente.</li>
+      <li><strong>Agente → Usuario:</strong> Las respuestas del agente se publican en NATS por el sidecar y se reenvian al frontend a traves del servidor API.</li>
+    </ul>
+
+    <p>
+      La autenticacion de NATS se maneja a traves de la variable de entorno
+      <code>NATS_AUTH_TOKEN</code>, asegurando que solo los componentes autorizados puedan conectarse.
+    </p>
+
+    <h2>Internos del Contenedor de Agentes</h2>
+
+    <p>
+      El lider de cada equipo se ejecuta dentro de un contenedor Docker basado en la
+      imagen <code>ghcr.io/helmcode/agent_crew_agent</code>. El contenedor
+      incluye varios componentes:
+    </p>
+
+    <h3>Proceso Sidecar</h3>
+
+    <p>
+      El sidecar es un proceso ligero que conecta los mensajes NATS con la
+      interfaz stdin/stdout de Claude Code. Este:
+    </p>
+
+    <ol>
+      <li>Se suscribe al subject NATS del equipo para mensajes entrantes.</li>
+      <li>Escribe los mensajes entrantes en el stdin de Claude Code.</li>
+      <li>Lee el stdout de Claude Code y publica las respuestas de vuelta a NATS.</li>
+    </ol>
+
+    <p>
+      Este diseno mantiene a Claude Code sin conocimiento de la infraestructura de mensajeria.
+      Simplemente lee de stdin y escribe en stdout, mientras que el sidecar
+      maneja toda la comunicacion de red.
+    </p>
+
+    <h3>CLI de Skills</h3>
+
+    <p>
+      Antes de que Claude Code inicie, el contenedor ejecuta el paso de instalacion
+      de habilidades. Itera sobre las habilidades configuradas para el equipo e instala
+      cada una usando el comando <code>npx skills add</code>. Las habilidades se
+      colocan en <code>.agents/skills/</code> con enlaces simbolicos creados en
+      <code>.claude/skills/</code>.
+    </p>
+
+    <h3>Espacio de Trabajo</h3>
+
+    <p>
+      El directorio <code>/workspace</code> dentro del contenedor es:
+    </p>
+
+    <ul>
+      <li>Un <strong>bind mount</strong> de un directorio del host (cuando se configura una ruta de espacio de trabajo), o</li>
+      <li>Un <strong>volumen Docker</strong> (cuando no se especifica ruta de espacio de trabajo).</li>
+    </ul>
+
+    <p>
+      Aqui es donde los agentes leen y escriben archivos del proyecto. El
+      directorio <code>.claude/</code> dentro del espacio de trabajo contiene las instrucciones
+      del lider, definiciones de agentes y habilidades.
+    </p>
+
+    <h3>Estructura del Directorio .claude/</h3>
+
+    <pre><code class="language-text">/workspace/.claude/
+  CLAUDE.md              # Leader agent instructions and team context
+  agents/
+    frontend-dev.md      # Worker: Frontend Developer definition
+    backend-dev.md       # Worker: Backend Developer definition
+    devops-engineer.md   # Worker: DevOps Engineer definition
+  skills/
+    skill-name → ../../.agents/skills/skill-name   # Symlinks to installed skills</code></pre>
+
+    <h2>Lider vs Trabajadores</h2>
+
+    <h3>Lider</h3>
+
+    <p>
+      El lider es el unico agente que se ejecuta dentro de un contenedor. Recibe
+      mensajes del usuario, interpreta la solicitud y coordina el trabajo
+      delegando tareas a los trabajadores. Las instrucciones del lider se definen en
+      <code>/workspace/.claude/CLAUDE.md</code>.
+    </p>
+
+    <h3>Trabajadores</h3>
+
+    <p>
+      Los trabajadores <strong>no</strong> se ejecutan en contenedores separados. En su lugar,
+      se definen como archivos Markdown en <code>/workspace/.claude/agents/</code>.
+      Claude Code lee estos archivos y genera trabajadores como sub-agentes dentro del
+      mismo proceso. El archivo <code>.md</code> de cada trabajador contiene su nombre,
+      rol e instrucciones detalladas.
+    </p>
+
+    <p>
+      Este diseno mantiene el uso de recursos eficiente. Solo un contenedor se ejecuta por equipo,
+      sin importar cuantos trabajadores esten definidos.
+    </p>
+
+    <h2>Runtime de Docker</h2>
+
+    <p>
+      Cuando se crea un equipo, el servidor API aprovisiona los siguientes recursos
+      de Docker:
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Recurso</th>
+          <th>Descripcion</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Red</strong></td>
+          <td>Una red Docker aislada para el equipo, conectando el contenedor NATS y el contenedor del agente.</td>
+        </tr>
+        <tr>
+          <td><strong>Contenedor NATS</strong></td>
+          <td>Una instancia de servidor NATS dedicada al equipo, configurada con el token de autenticacion compartido.</td>
+        </tr>
+        <tr>
+          <td><strong>Volumen de Espacio de Trabajo</strong></td>
+          <td>Un volumen Docker (o bind mount) para el directorio <code>/workspace</code>.</td>
+        </tr>
+        <tr>
+          <td><strong>Contenedor del Lider</strong></td>
+          <td>El contenedor del agente ejecutando el proceso sidecar y el CLI de Claude Code.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+      Todos los recursos estan organizados por ID de equipo para evitar conflictos entre
+      multiples equipos en ejecucion.
+    </p>
+
+    <h2>Runtime de Kubernetes (Proximamente)</h2>
+
+    <p>
+      Un runtime de Kubernetes esta planificado para despliegues en produccion. El diseno
+      sigue la misma arquitectura logica con recursos nativos de Kubernetes:
+    </p>
+
+    <ul>
+      <li><strong>Namespace por equipo</strong>: Aislamiento entre equipos usando namespaces de Kubernetes.</li>
+      <li><strong>PersistentVolumeClaims</strong>: Para almacenamiento del espacio de trabajo y persistencia de la base de datos.</li>
+      <li><strong>Pods</strong>: Contenedores NATS y de agentes ejecutandose como pods con limites de recursos apropiados.</li>
+      <li><strong>Services</strong>: Red interna entre pods NATS y de agentes.</li>
+    </ul>
+
+    <p>
+      El runtime de Kubernetes soportara escalado horizontal, mejor gestion de
+      recursos e integracion con infraestructura de cluster existente.
+    </p>
+
+    <h2>Flujo de Datos: Enviar un Mensaje</h2>
+
+    <p>
+      Este es el flujo completo cuando un usuario envia un mensaje a un equipo:
+    </p>
+
+    <ol>
+      <li>El usuario escribe un mensaje en la interfaz de chat del frontend.</li>
+      <li>El frontend envia el mensaje al servidor API via HTTP/WebSocket.</li>
+      <li>El servidor API publica el mensaje en el subject NATS del equipo.</li>
+      <li>El proceso sidecar dentro del contenedor del agente recibe el mensaje NATS.</li>
+      <li>El sidecar escribe el mensaje en el stdin de Claude Code.</li>
+      <li>Claude Code procesa la solicitud, potencialmente delegando a sub-agentes trabajadores.</li>
+      <li>Claude Code escribe las respuestas en stdout.</li>
+      <li>El sidecar lee stdout y publica fragmentos de respuesta en NATS.</li>
+      <li>El servidor API recibe los mensajes NATS y los reenvia al frontend.</li>
+      <li>El frontend renderiza la respuesta en tiempo real a medida que llegan los fragmentos.</li>
+    </ol>
+
+    <h2>Siguientes Pasos</h2>
+
+    <ul>
+      <li>
+        <a href="/es/docs/skills">Habilidades</a>: Entiende como las habilidades extienden las
+        capacidades de los agentes y se integran en el contenedor.
+      </li>
+      <li>
+        <a href="/es/docs/configuration">Configuracion</a>: Revisa todas las
+        opciones de configuracion para personalizar tu despliegue.
+      </li>
+      <li>
+        <a href="/es/docs/quick-start">Inicio Rapido</a>: Pon AgentCrew en marcha
+        localmente en menos de 5 minutos.
+      </li>
+    </ul>
+  </div>
+</DocsLayout>

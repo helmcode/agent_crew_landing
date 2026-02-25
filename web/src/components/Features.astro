@@ -1,4 +1,11 @@
 ---
+import { useTranslations } from '../i18n/utils';
+import type { Lang } from '../i18n/ui';
+
+interface Props { lang?: Lang; }
+const lang = Astro.props.lang ?? 'en';
+const t = useTranslations(lang);
+
 const features = [
   {
     icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="9" r="3"/><circle cx="19" cy="9" r="3"/><circle cx="12" cy="4" r="3"/><path d="M5 12v3M19 12v3M12 7v3"/><circle cx="5" cy="18" r="3"/><circle cx="12" cy="18" r="3"/><circle cx="19" cy="18" r="3"/></svg>`,
@@ -6,8 +13,8 @@ const features = [
     iconBg: 'rgba(59, 130, 246, 0.15)',
     iconBorder: 'rgba(59, 130, 246, 0.3)',
     hoverBorder: 'rgba(59, 130, 246, 0.5)',
-    title: 'Create Teams for Anything',
-    description: 'Build agent teams for any domain: engineering, content creation, data analysis, customer support, legal review. Write Markdown instructions and deploy.',
+    title: t('features.f1Title'),
+    description: t('features.f1Desc'),
   },
   {
     icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>`,
@@ -15,8 +22,8 @@ const features = [
     iconBg: 'rgba(139, 92, 246, 0.15)',
     iconBorder: 'rgba(139, 92, 246, 0.3)',
     hoverBorder: 'rgba(139, 92, 246, 0.5)',
-    title: 'Deploy Instantly',
-    description: 'Launch agent containers on Docker or Kubernetes with a single click. Infrastructure is provisioned automatically.',
+    title: t('features.f2Title'),
+    description: t('features.f2Desc'),
   },
   {
     icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>`,
@@ -24,8 +31,8 @@ const features = [
     iconBg: 'rgba(52, 211, 153, 0.15)',
     iconBorder: 'rgba(52, 211, 153, 0.3)',
     hoverBorder: 'rgba(52, 211, 153, 0.5)',
-    title: 'Monitor in Real-Time',
-    description: 'Watch your agents work via live logs, WebSocket streams, and a real-time chat interface. Full visibility into every agent action.',
+    title: t('features.f3Title'),
+    description: t('features.f3Desc'),
   },
   {
     icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
@@ -33,8 +40,8 @@ const features = [
     iconBg: 'rgba(251, 146, 60, 0.15)',
     iconBorder: 'rgba(251, 146, 60, 0.3)',
     hoverBorder: 'rgba(251, 146, 60, 0.5)',
-    title: 'Leader + Workers',
-    description: 'Define a leader agent that coordinates tasks and specialized workers that execute them. Like a real team, each agent has a clear role and expertise.',
+    title: t('features.f4Title'),
+    description: t('features.f4Desc'),
   },
 ];
 ---
@@ -43,12 +50,12 @@ const features = [
   <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
     <!-- Header -->
     <div class="text-center mb-16">
-      <span class="text-xs font-semibold tracking-widest uppercase text-blue-400 mb-4 block">Capabilities</span>
+      <span class="text-xs font-semibold tracking-widest uppercase text-blue-400 mb-4 block">{t('features.label')}</span>
       <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
-        One platform, <span class="gradient-text">any mission</span>
+        {t('features.heading')} <span class="gradient-text">{t('features.headingGradient')}</span>
       </h2>
       <p class="text-lg text-slate-400 max-w-2xl mx-auto">
-        AgentCrew handles the orchestration: team creation, deployment, communication, and monitoring. You focus on defining what your agents should accomplish.
+        {t('features.subtitle')}
       </p>
     </div>
 

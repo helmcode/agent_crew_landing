@@ -2,20 +2,30 @@
 import '../styles/global.css';
 import Navbar from '../components/Navbar.astro';
 import Footer from '../components/Footer.astro';
+import { useTranslations, getBaseUrl, getLocalizedPath } from '../i18n/utils';
+import type { Lang } from '../i18n/ui';
 
 export interface Props {
   title?: string;
   description?: string;
   canonicalURL?: string;
+  lang?: Lang;
 }
 
 const {
   title = 'Docs | AgentCrew',
   description = 'AgentCrew documentation. Learn how to build, deploy and orchestrate collaborative AI agent teams.',
   canonicalURL = Astro.url.href,
+  lang = 'en',
 } = Astro.props;
 
+const t = useTranslations(lang);
+const base = getBaseUrl(lang);
 const currentPath = Astro.url.pathname;
+
+const enPath = lang === 'en' ? currentPath : getLocalizedPath(currentPath, 'en');
+const esPath = lang === 'es' ? currentPath : getLocalizedPath(currentPath, 'es');
+const siteUrl = 'https://agentcrew.helmcode.com';
 
 interface NavItem {
   href: string;
@@ -29,38 +39,43 @@ interface NavSection {
 
 const sidebarSections: NavSection[] = [
   {
-    title: 'Getting Started',
+    title: t('docs.gettingStarted'),
     items: [
-      { href: '/docs', label: 'Overview' },
-      { href: '/docs/quick-start', label: 'Quick Start' },
-      { href: '/docs/configuration', label: 'Configuration' },
+      { href: `${base}/docs`, label: t('docs.overview') },
+      { href: `${base}/docs/quick-start`, label: t('docs.quickStart') },
+      { href: `${base}/docs/configuration`, label: t('docs.configuration') },
     ],
   },
   {
-    title: 'Core Concepts',
+    title: t('docs.coreConcepts'),
     items: [
-      { href: '/docs/skills', label: 'Skills' },
-      { href: '/docs/architecture', label: 'Architecture' },
+      { href: `${base}/docs/skills`, label: t('docs.skills') },
+      { href: `${base}/docs/architecture`, label: t('docs.architecture') },
     ],
   },
 ];
 
 function isActive(href: string): boolean {
-  if (href === '/docs') {
-    return currentPath === '/docs' || currentPath === '/docs/';
+  const normalizedHref = href.replace(/\/$/, '');
+  const normalizedPath = currentPath.replace(/\/$/, '');
+  if (normalizedHref === `${base}/docs`) {
+    return normalizedPath === `${base}/docs`;
   }
-  return currentPath.startsWith(href);
+  return normalizedPath.startsWith(normalizedHref);
 }
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={lang}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
     <meta name="generator" content={Astro.generator} />
     <link rel="canonical" href={canonicalURL} />
+    <link rel="alternate" hreflang="en" href={`${siteUrl}${enPath}`} />
+    <link rel="alternate" hreflang="es" href={`${siteUrl}${esPath}`} />
+    <link rel="alternate" hreflang="x-default" href={`${siteUrl}${enPath}`} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
@@ -73,7 +88,7 @@ function isActive(href: string): boolean {
     <title>{title}</title>
   </head>
   <body>
-    <Navbar />
+    <Navbar lang={lang} />
 
     <!-- Mobile sidebar toggle -->
     <button
@@ -143,7 +158,7 @@ function isActive(href: string): boolean {
             <slot />
           </article>
         </div>
-        <Footer />
+        <Footer lang={lang} />
       </main>
     </div>
 
@@ -187,7 +202,6 @@ function isActive(href: string): boolean {
 
       overlay?.addEventListener('click', closeSidebar);
 
-      // Close sidebar when clicking a link (mobile)
       sidebar?.querySelectorAll('a').forEach((link) => {
         link.addEventListener('click', () => {
           if (window.innerWidth < 768) {
@@ -196,7 +210,6 @@ function isActive(href: string): boolean {
         });
       });
 
-      // Close sidebar on resize to desktop
       window.addEventListener('resize', () => {
         if (window.innerWidth >= 768 && isOpen) {
           closeSidebar();

@@ -1,0 +1,97 @@
+---
+import { useTranslations } from '../i18n/utils';
+import type { Lang } from '../i18n/ui';
+
+interface Props { lang?: Lang; }
+const lang = Astro.props.lang ?? 'en';
+const t = useTranslations(lang);
+---
+
+<section id="contact" class="py-24 sm:py-32" style="background: linear-gradient(180deg, #0a0f1e 0%, #0f172a 50%, #0a0f1e 100%);">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-16">
+      <span class="text-xs font-semibold tracking-widest uppercase text-blue-400 mb-4 block">{t('contact.label')}</span>
+      <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
+        {t('contact.heading')} {t('contact.headingGradient') && <span class="gradient-text">{t('contact.headingGradient')}</span>}
+      </h2>
+      <p class="text-lg text-slate-400 max-w-2xl mx-auto">
+        {t('contact.subtitle')}
+      </p>
+    </div>
+
+    <div class="max-w-2xl mx-auto rounded-2xl border border-slate-800 p-8 sm:p-10" style="background: linear-gradient(135deg, #0d1117, #111827);">
+      <form
+        action="https://formsubmit.co/hello+agentcrew@helmcode.com"
+        method="POST"
+        class="space-y-6"
+      >
+        <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
+        <input type="hidden" name="_captcha" value="false">
+        <input type="hidden" name="_next" value="https://agentcrew.helmcode.com/#contact">
+
+        <div>
+          <label for="name" class="block text-sm font-medium text-slate-300 mb-2">{t('contact.name')}</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            required
+            class="w-full px-4 py-3 rounded-lg border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+            style="background-color: #0a0f1e;"
+            placeholder={t('contact.namePlaceholder')}
+          />
+        </div>
+
+        <div>
+          <label for="email" class="block text-sm font-medium text-slate-300 mb-2">{t('contact.email')}</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            required
+            class="w-full px-4 py-3 rounded-lg border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+            style="background-color: #0a0f1e;"
+            placeholder={t('contact.emailPlaceholder')}
+          />
+        </div>
+
+        <div>
+          <label for="company" class="block text-sm font-medium text-slate-300 mb-2">
+            {t('contact.company')} <span class="text-slate-500">{t('contact.companyOptional')}</span>
+          </label>
+          <input
+            type="text"
+            id="company"
+            name="company"
+            class="w-full px-4 py-3 rounded-lg border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+            style="background-color: #0a0f1e;"
+            placeholder={t('contact.companyPlaceholder')}
+          />
+        </div>
+
+        <div>
+          <label for="message" class="block text-sm font-medium text-slate-300 mb-2">{t('contact.message')}</label>
+          <textarea
+            id="message"
+            name="message"
+            required
+            rows="4"
+            class="w-full px-4 py-3 rounded-lg border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors resize-none"
+            style="background-color: #0a0f1e;"
+            placeholder={t('contact.messagePlaceholder')}
+          ></textarea>
+        </div>
+
+        <button
+          type="submit"
+          class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold px-8 py-3.5 rounded-lg transition-all duration-200 glow-blue text-base"
+        >
+          {t('contact.submit')}
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+          </svg>
+        </button>
+      </form>
+    </div>
+  </div>
+</section>

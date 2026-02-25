@@ -1,0 +1,183 @@
+---
+import DocsLayout from '../../../layouts/DocsLayout.astro';
+---
+
+<DocsLayout title="Habilidades | AgentCrew" lang="es">
+  <div class="docs-prose">
+    <h1>Habilidades (Skills)</h1>
+
+    <p>
+      Las habilidades son extensiones que dan a los agentes capacidades especializadas
+      obtenidas de repositorios de GitHub. Te permiten expandir lo que tus agentes
+      pueden hacer sin modificar sus instrucciones base, desde interactuar con
+      APIs externas hasta seguir estandares de codigo especificos del proyecto.
+    </p>
+
+    <h2>Como Funcionan las Habilidades</h2>
+
+    <p>
+      Internamente, las habilidades se instalan usando el CLI de skills de Claude Code:
+    </p>
+
+    <pre><code class="language-bash">npx skills add &lt;github_repo_url&gt; --skill &lt;skill_name&gt; --agent claude-code -y</code></pre>
+
+    <p>
+      Este comando obtiene la definicion de la habilidad de un repositorio de GitHub y
+      la instala en el entorno del agente. Una vez instalada, la habilidad
+      se convierte en parte de las capacidades disponibles del agente y Claude Code puede
+      usarla automaticamente cuando sea relevante.
+    </p>
+
+    <h2>Tipos de Habilidades</h2>
+
+    <h3>Habilidades de Agente (Especificas del Trabajador)</h3>
+
+    <p>
+      Las habilidades de agente se instalan en un trabajador especifico y solo estan disponibles
+      para ese trabajador. Usalas cuando una capacidad es relevante solo para un rol.
+    </p>
+
+    <p>
+      Por ejemplo, podrias instalar una habilidad de Kubernetes solo en tu trabajador
+      "DevOps Engineer", o una habilidad de testing de React solo en tu trabajador
+      "Frontend Developer".
+    </p>
+
+    <h3>Habilidades Globales (Lider)</h3>
+
+    <p>
+      Las habilidades globales se instalan en el agente <strong>lider</strong> y se
+      comparten automaticamente con <strong>todos los agentes</strong> del equipo.
+      Aparecen en la configuracion de cada trabajador, haciendolas disponibles en
+      todo el equipo.
+    </p>
+
+    <p>
+      Usa habilidades globales para capacidades que todos los agentes deberian tener, como
+      convenciones de proyecto, estandares de documentacion o integraciones de
+      herramientas compartidas.
+    </p>
+
+    <blockquote>
+      <strong>Consejo:</strong> En la interfaz, el agente lider esta etiquetado con
+      <strong>"(global)"</strong> para indicar que las habilidades instaladas en el
+      se comparten con todos los miembros del equipo.
+    </blockquote>
+
+    <h2>Agregar Habilidades Durante la Creacion del Equipo</h2>
+
+    <p>
+      Al crear un nuevo equipo, puedes adjuntar habilidades en el <strong>Paso 2</strong>
+      del asistente de creacion:
+    </p>
+
+    <ol>
+      <li>
+        <strong>Habilidades del lider (globales):</strong> En la seccion de configuracion
+        del lider, agrega habilidades proporcionando la URL del repositorio de GitHub y el nombre
+        de la habilidad. Estas estaran disponibles para todos los agentes.
+      </li>
+      <li>
+        <strong>Habilidades de trabajador:</strong> En la seccion de configuracion de cada
+        trabajador, agrega habilidades especificas para el rol de ese trabajador. Estas solo
+        estaran disponibles para ese trabajador en particular.
+      </li>
+    </ol>
+
+    <p>
+      Cada entrada de habilidad requiere:
+    </p>
+
+    <ul>
+      <li><strong>URL del Repositorio</strong>: El repositorio de GitHub que contiene la habilidad (por ejemplo, <code>https://github.com/anthropics/skills</code>)</li>
+      <li><strong>Nombre de la habilidad</strong>: El nombre de la habilidad dentro de ese repositorio (por ejemplo, <code>create-react-app</code>)</li>
+    </ul>
+
+    <h2>Encontrar Habilidades</h2>
+
+    <p>
+      Puedes descubrir habilidades disponibles y encontrar la URL exacta del repositorio y
+      el nombre de la habilidad que necesitas en <a href="https://skills.sh/" target="_blank" rel="noopener"><strong>skills.sh</strong></a>.
+      Navega o busca en el directorio para encontrar habilidades relevantes para los
+      roles de tus agentes, luego copia la URL de GitHub y el nombre de la habilidad directamente en AgentCrew.
+    </p>
+
+    <h2>Agregar Habilidades a Equipos en Ejecucion</h2>
+
+    <p>
+      Tambien puedes agregar habilidades a equipos que ya estan en ejecucion:
+    </p>
+
+    <ol>
+      <li>Abre la vista de chat del equipo.</li>
+      <li>Haz clic en el icono de <strong>Configuracion</strong> para abrir el modal de ajustes del equipo.</li>
+      <li>Selecciona cualquier agente de la lista:
+        <ul>
+          <li>Selecciona el <strong>lider (global)</strong> para agregar habilidades compartidas con todos los agentes.</li>
+          <li>Selecciona un <strong>trabajador</strong> especifico para agregar habilidades solo para ese trabajador.</li>
+        </ul>
+      </li>
+      <li>Agrega la nueva habilidad con su URL de repositorio y nombre de habilidad.</li>
+      <li>Guarda los cambios. La habilidad se instalara en el proximo reinicio del agente.</li>
+    </ol>
+
+    <h2>Almacenamiento y Descubrimiento</h2>
+
+    <p>
+      Las habilidades se organizan en dos directorios dentro del contenedor del agente:
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Directorio</th>
+          <th>Proposito</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>.agents/skills/</code></td>
+          <td>Contiene los archivos reales de habilidades descargados de repositorios de GitHub.</td>
+        </tr>
+        <tr>
+          <td><code>.claude/skills/</code></td>
+          <td>Contiene enlaces simbolicos que apuntan a <code>.agents/skills/</code>. Asi es como Claude Code descubre y carga las habilidades instaladas.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+      Esta estructura de dos directorios separa el almacenamiento de habilidades del
+      descubrimiento de habilidades. El directorio <code>.agents/skills/</code> contiene la fuente
+      de verdad, mientras que <code>.claude/skills/</code> proporciona la interfaz que
+      Claude Code espera.
+    </p>
+
+    <pre><code class="language-text">/workspace/
+  .agents/
+    skills/
+      create-react-app/      # Actual skill files
+      kubernetes-ops/         # Actual skill files
+  .claude/
+    skills/
+      create-react-app → ../../.agents/skills/create-react-app   # Symlink
+      kubernetes-ops   → ../../.agents/skills/kubernetes-ops      # Symlink
+    agents/
+      frontend-dev.md        # Worker agent definition
+      devops-engineer.md     # Worker agent definition
+    CLAUDE.md                # Leader instructions</code></pre>
+
+    <h2>Siguientes Pasos</h2>
+
+    <ul>
+      <li>
+        <a href="/es/docs/architecture">Arquitectura</a>: Aprende como estan
+        estructurados los contenedores de agentes y como las habilidades encajan en el runtime.
+      </li>
+      <li>
+        <a href="/es/docs/configuration">Configuracion</a>: Revisa todos los
+        ajustes disponibles para personalizar tu instalacion.
+      </li>
+    </ul>
+  </div>
+</DocsLayout>

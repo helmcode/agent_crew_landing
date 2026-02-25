@@ -1,16 +1,23 @@
 ---
+import { useTranslations, getBaseUrl } from '../i18n/utils';
+import type { Lang } from '../i18n/ui';
+
+interface Props { lang?: Lang; }
+const lang = Astro.props.lang ?? 'en';
+const t = useTranslations(lang);
+const base = getBaseUrl(lang);
 ---
 
 <section id="what-is" class="py-24 sm:py-32" style="background-color: #0a0f1e;">
   <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
     <!-- Section label -->
     <div class="text-center mb-16">
-      <span class="text-xs font-semibold tracking-widest uppercase text-blue-400 mb-4 block">About</span>
+      <span class="text-xs font-semibold tracking-widest uppercase text-blue-400 mb-4 block">{t('whatIs.label')}</span>
       <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-6">
-        What is <span class="gradient-text">AgentCrew</span>?
+        {t('whatIs.heading')} <span class="gradient-text">{t('whatIs.headingGradient')}</span>
       </h2>
       <p class="text-lg text-slate-400 max-w-3xl mx-auto leading-relaxed">
-        AgentCrew is an open-source AI agent orchestrator. Just as Kubernetes orchestrates containers regardless of the application inside, AgentCrew orchestrates AI agents regardless of their purpose. Define your team, describe their roles in plain text, deploy, and let them collaborate autonomously.
+        {t('whatIs.subtitle')}
       </p>
     </div>
 
@@ -29,9 +36,9 @@
             <circle cx="19" cy="18" r="3"/>
           </svg>
         </div>
-        <h3 class="text-white font-semibold text-lg mb-2">Purpose-Agnostic</h3>
+        <h3 class="text-white font-semibold text-lg mb-2">{t('whatIs.card1Title')}</h3>
         <p class="text-slate-400 text-sm leading-relaxed">
-          Build teams for software engineering, marketing, finance, research, operations, or any domain. Agent specialization is driven by documentation, not code.
+          {t('whatIs.card1Desc')}
         </p>
       </div>
 
@@ -45,9 +52,9 @@
             <line x1="16" y1="17" x2="8" y2="17"/>
           </svg>
         </div>
-        <h3 class="text-white font-semibold text-lg mb-2">Documentation-Driven</h3>
+        <h3 class="text-white font-semibold text-lg mb-2">{t('whatIs.card2Title')}</h3>
         <p class="text-slate-400 text-sm leading-relaxed">
-          Agents are defined by Markdown files with instructions, roles, and skills. Write what an agent should do, and it becomes that specialist. No code required.
+          {t('whatIs.card2Desc')}
         </p>
       </div>
 
@@ -60,9 +67,9 @@
             <path d="M7 8h2M11 8h6M7 11h4M13 11h4"/>
           </svg>
         </div>
-        <h3 class="text-white font-semibold text-lg mb-2">Any Infrastructure</h3>
+        <h3 class="text-white font-semibold text-lg mb-2">{t('whatIs.card3Title')}</h3>
         <p class="text-slate-400 text-sm leading-relaxed">
-          Deploy on Docker for local development or scale to Kubernetes in production. Your infrastructure, your rules.
+          {t('whatIs.card3Desc')}
         </p>
       </div>
     </div>

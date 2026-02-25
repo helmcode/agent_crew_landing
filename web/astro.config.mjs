@@ -8,6 +8,14 @@ export default defineConfig({
   output: 'static',
   site: 'https://agentcrew.helmcode.com',
 
+  i18n: {
+    defaultLocale: 'en',
+    locales: ['en', 'es'],
+    routing: {
+      prefixDefaultLocale: false,
+    },
+  },
+
   vite: {
     plugins: [tailwindcss()],
   },

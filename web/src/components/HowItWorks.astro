@@ -1,27 +1,34 @@
 ---
+import { useTranslations } from '../i18n/utils';
+import type { Lang } from '../i18n/ui';
+
+interface Props { lang?: Lang; }
+const lang = Astro.props.lang ?? 'en';
+const t = useTranslations(lang);
+
 const steps = [
   {
     number: '01',
-    title: 'Define your team',
-    description: 'Name your team, choose a leader, and add workers. Each agent gets a role, instructions, and optional skills, all defined in plain text.',
+    title: t('howItWorks.s1Title'),
+    description: t('howItWorks.s1Desc'),
     icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>`,
   },
   {
     number: '02',
-    title: 'Write the mission',
-    description: 'Describe what each agent should do in Markdown. A marketing strategist, a data analyst, a code reviewer. Specialization comes from documentation.',
+    title: t('howItWorks.s2Title'),
+    description: t('howItWorks.s2Desc'),
     icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>`,
   },
   {
     number: '03',
-    title: 'Deploy',
-    description: 'Click deploy. AgentCrew provisions a Docker network, NATS message bus, and starts the agent container automatically.',
+    title: t('howItWorks.s3Title'),
+    description: t('howItWorks.s3Desc'),
     icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>`,
   },
   {
     number: '04',
-    title: 'Chat & Monitor',
-    description: 'Send tasks to your team through the chat interface. The leader delegates, workers execute, and you watch it all happen in real time.',
+    title: t('howItWorks.s4Title'),
+    description: t('howItWorks.s4Desc'),
     icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`,
   },
 ];
@@ -31,12 +38,12 @@ const steps = [
   <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
     <!-- Header -->
     <div class="text-center mb-16">
-      <span class="text-xs font-semibold tracking-widest uppercase text-blue-400 mb-4 block">Process</span>
+      <span class="text-xs font-semibold tracking-widest uppercase text-blue-400 mb-4 block">{t('howItWorks.label')}</span>
       <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
-        How it <span class="gradient-text">works</span>
+        {t('howItWorks.heading')} <span class="gradient-text">{t('howItWorks.headingGradient')}</span>
       </h2>
       <p class="text-lg text-slate-400 max-w-2xl mx-auto">
-        From zero to a running AI agent team in minutes. No complex setup required.
+        {t('howItWorks.subtitle')}
       </p>
     </div>
 
