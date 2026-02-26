@@ -54,6 +54,7 @@ export const ui: Record<Lang, Record<string, string>> = {
     'docs.configuration': 'Configuration',
     'docs.coreConcepts': 'Core Concepts',
     'docs.skills': 'Skills',
+    'docs.schedules': 'Schedules',
     'docs.architecture': 'Architecture',
   },
   es: {
@@ -102,6 +103,7 @@ export const ui: Record<Lang, Record<string, string>> = {
     'docs.configuration': 'Configuracion',
     'docs.coreConcepts': 'Conceptos Clave',
     'docs.skills': 'Habilidades',
+    'docs.schedules': 'Tareas Programadas',
     'docs.architecture': 'Arquitectura',
   },
 };

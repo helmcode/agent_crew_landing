@@ -1,0 +1,222 @@
+---
+import DocsLayout from '../../../layouts/DocsLayout.astro';
+---
+
+<DocsLayout title="Tareas Programadas | AgentCrew" lang="es">
+  <div class="docs-prose">
+    <h1>Tareas Programadas (Schedules)</h1>
+
+    <p>
+      Las tareas programadas te permiten automatizar trabajo recurrente ejecutando
+      equipos de agentes en una cadencia basada en cron. Define un prompt, selecciona
+      un equipo, configura la frecuencia, y AgentCrew se encarga del resto: desplegar
+      el equipo, enviar el prompt, registrar el resultado y liberar la infraestructura.
+    </p>
+
+    <h2>Como Funcionan las Tareas Programadas</h2>
+
+    <p>
+      Cuando una tarea programada se activa, AgentCrew ejecuta los siguientes pasos
+      automaticamente:
+    </p>
+
+    <ol>
+      <li><strong>Desplegar</strong> el equipo asignado (contenedores, bus NATS, workspace).</li>
+      <li><strong>Enviar</strong> el prompt configurado al lider del equipo via NATS.</li>
+      <li><strong>Esperar</strong> la respuesta del lider (hasta el timeout configurado).</li>
+      <li><strong>Registrar</strong> el prompt y la respuesta como una ejecucion de la tarea.</li>
+      <li><strong>Liberar</strong> la infraestructura del equipo para liberar recursos.</li>
+    </ol>
+
+    <p>
+      Todo el ciclo de vida es gestionado por un motor de programacion en segundo plano
+      que verifica cada 60 segundos, evalua expresiones cron y lanza ejecuciones en
+      paralelo con limites de concurrencia configurables.
+    </p>
+
+    <h2>Crear una Tarea Programada</h2>
+
+    <p>
+      Navega a la seccion <strong>Schedules</strong> en la barra lateral y haz clic
+      en <strong>New Schedule</strong>. El constructor de tareas te guia a traves de:
+    </p>
+
+    <ol>
+      <li>
+        <strong>Nombre:</strong> Un nombre descriptivo para la tarea (por ejemplo,
+        "Post Semanal del Blog", "Reporte Diario").
+      </li>
+      <li>
+        <strong>Equipo:</strong> Selecciona que equipo de agentes ejecutara la tarea.
+        El equipo debe existir previamente.
+      </li>
+      <li>
+        <strong>Prompt:</strong> La instruccion enviada al lider del equipo cuando
+        se activa la tarea. Escribela como lo harias en la interfaz de chat.
+      </li>
+      <li>
+        <strong>Frecuencia:</strong> Usa el constructor visual para elegir cadencias
+        por hora, diarias, semanales o mensuales. El constructor genera la expresion
+        cron automaticamente.
+      </li>
+      <li>
+        <strong>Zona horaria:</strong> Las tareas evaluan las expresiones cron en la
+        zona horaria seleccionada. La zona horaria de tu navegador se detecta
+        automaticamente, pero puedes cambiarla.
+      </li>
+    </ol>
+
+    <h2>Constructor de Frecuencia</h2>
+
+    <p>
+      El constructor visual de frecuencia simplifica la creacion de expresiones cron.
+      No necesitas conocer la sintaxis cron — solo elige el patron:
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Frecuencia</th>
+          <th>Opciones</th>
+          <th>Ejemplo cron</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Cada hora</strong></td>
+          <td>Se ejecuta una vez por hora en un minuto fijo</td>
+          <td><code>0 * * * *</code></td>
+        </tr>
+        <tr>
+          <td><strong>Diaria</strong></td>
+          <td>Se ejecuta una vez al dia a una hora especifica</td>
+          <td><code>30 9 * * *</code></td>
+        </tr>
+        <tr>
+          <td><strong>Semanal</strong></td>
+          <td>Elige uno o mas dias de la semana y una hora</td>
+          <td><code>0 10 * * 1,3,5</code></td>
+        </tr>
+        <tr>
+          <td><strong>Mensual</strong></td>
+          <td>Elige un dia del mes y una hora</td>
+          <td><code>0 8 1 * *</code></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+      La expresion cron generada se muestra como una vista previa en vivo en formato
+      legible (por ejemplo, "Cada lunes, miercoles, viernes a las 10:00").
+    </p>
+
+    <h2>Gestionar Tareas Programadas</h2>
+
+    <h3>Activar / Desactivar</h3>
+
+    <p>
+      Cada tarea programada tiene un interruptor para activarla o desactivarla.
+      Las tareas desactivadas no son evaluadas por el motor de programacion.
+      Al reactivarlas, la proxima ejecucion se recalcula automaticamente.
+    </p>
+
+    <h3>Editar</h3>
+
+    <p>
+      Haz clic en cualquier tarea para editar su nombre, prompt, equipo, frecuencia
+      o zona horaria. Los cambios toman efecto inmediatamente — la proxima ejecucion
+      se recalcula al guardar.
+    </p>
+
+    <h3>Eliminar</h3>
+
+    <p>
+      Eliminar una tarea programada la borra junto con todo su historial de
+      ejecuciones de forma permanente.
+    </p>
+
+    <h2>Historial de Ejecuciones</h2>
+
+    <p>
+      Cada tarea programada mantiene un historial paginado de todas las ejecuciones.
+      Para cada ejecucion puedes ver:
+    </p>
+
+    <ul>
+      <li><strong>Estado:</strong> exitoso, error o timeout.</li>
+      <li><strong>Inicio / Fin:</strong> Marcas de tiempo en tu zona horaria local.</li>
+      <li><strong>Duracion:</strong> Cuanto tiempo tomo la ejecucion.</li>
+      <li><strong>Conversacion:</strong> Expande cualquier ejecucion para ver el prompt enviado y la respuesta del agente, renderizada como un mini-chat con soporte de Markdown.</li>
+    </ul>
+
+    <p>
+      Tambien puedes navegar directamente al chat del equipo desde cualquier pagina
+      de detalle de tarea usando el icono de chat en el encabezado.
+    </p>
+
+    <h2>Configuracion</h2>
+
+    <p>
+      El comportamiento del motor de programacion se puede ajustar con variables de
+      entorno:
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Variable</th>
+          <th>Defecto</th>
+          <th>Descripcion</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>SCHEDULE_TIMEOUT</code></td>
+          <td><code>1h</code></td>
+          <td>Tiempo maximo de espera para la respuesta del equipo antes de marcar la ejecucion como timeout. Acepta cadenas de duracion de Go (por ejemplo, <code>30m</code>, <code>2h</code>).</td>
+        </tr>
+        <tr>
+          <td><code>SCHEDULER_MAX_CONCURRENT</code></td>
+          <td><code>10</code></td>
+          <td>Numero maximo de tareas que pueden ejecutarse simultaneamente. Las tareas excedentes se difieren al siguiente tick.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Notas de Arquitectura</h2>
+
+    <ul>
+      <li>
+        El programador se ejecuta como una goroutine en segundo plano dentro del
+        proceso del servidor API — no se necesita un servicio separado.
+      </li>
+      <li>
+        Las reclamaciones de tareas son <strong>atomicas</strong>: el motor usa un
+        compare-and-swap a nivel de base de datos (<code>UPDATE WHERE status = 'idle'</code>)
+        para prevenir ejecuciones dobles cuando los ticks se solapan.
+      </li>
+      <li>
+        Las ejecuciones estan aisladas: cada ejecucion despliega una instancia
+        fresca del equipo y la libera al completarse, asegurando que no haya
+        fugas de estado entre ejecuciones.
+      </li>
+      <li>
+        La recuperacion de panics asegura que una ejecucion fallida nunca crashee
+        el programador — la tarea se resetea a idle y el error se registra en los logs.
+      </li>
+    </ul>
+
+    <h2>Siguientes Pasos</h2>
+
+    <ul>
+      <li>
+        <a href="/es/docs/configuration">Configuracion</a>: Revisa todas las
+        variables de entorno incluyendo las configuraciones especificas del programador.
+      </li>
+      <li>
+        <a href="/es/docs/architecture">Arquitectura</a>: Comprende como el
+        programador encaja en el diseno general del sistema.
+      </li>
+    </ul>
+  </div>
+</DocsLayout>

@@ -37,6 +37,8 @@ export const landing: Record<string, Record<string, string>> = {
     'features.f3Desc': 'Watch your agents work via live logs, WebSocket streams, and a real-time chat interface. Full visibility into every agent action.',
     'features.f4Title': 'Leader + Workers',
     'features.f4Desc': 'Define a leader agent that coordinates tasks and specialized workers that execute them. Like a real team, each agent has a clear role and expertise.',
+    'features.f5Title': 'Scheduled Tasks',
+    'features.f5Desc': 'Automate recurring work with cron-based schedules. Define a prompt, pick a frequency, and AgentCrew deploys the team, executes the task, and records the results automatically.',
 
     // HowItWorks
     'howItWorks.label': 'Process',
@@ -135,6 +137,8 @@ export const landing: Record<string, Record<string, string>> = {
     'features.f3Desc': 'Observa a tus agentes trabajar via logs en vivo, streams WebSocket y una interfaz de chat en tiempo real. Visibilidad total de cada accion del agente.',
     'features.f4Title': 'Lider + Trabajadores',
     'features.f4Desc': 'Define un agente lider que coordina tareas y trabajadores especializados que las ejecutan. Como un equipo real, cada agente tiene un rol y experiencia claros.',
+    'features.f5Title': 'Tareas Programadas',
+    'features.f5Desc': 'Automatiza trabajo recurrente con programaciones basadas en cron. Define un prompt, elige la frecuencia, y AgentCrew despliega el equipo, ejecuta la tarea y registra los resultados automaticamente.',
 
     // HowItWorks
     'howItWorks.label': 'Proceso',

@@ -1,0 +1,220 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+---
+
+<DocsLayout title="Schedules | AgentCrew" lang="en">
+  <div class="docs-prose">
+    <h1>Schedules</h1>
+
+    <p>
+      Schedules let you automate recurring tasks by running agent teams on a
+      cron-based cadence. Define a prompt, pick a team, set the frequency, and
+      AgentCrew handles the rest: deploying the team, sending the prompt,
+      recording the result, and tearing down the infrastructure.
+    </p>
+
+    <h2>How Schedules Work</h2>
+
+    <p>
+      When a schedule fires, AgentCrew performs the following steps
+      automatically:
+    </p>
+
+    <ol>
+      <li><strong>Deploy</strong> the assigned team (containers, NATS bus, workspace).</li>
+      <li><strong>Send</strong> the configured prompt to the team leader via NATS.</li>
+      <li><strong>Wait</strong> for the leader's response (up to the configured timeout).</li>
+      <li><strong>Record</strong> the prompt and response as a schedule run.</li>
+      <li><strong>Tear down</strong> the team infrastructure to free resources.</li>
+    </ol>
+
+    <p>
+      The entire lifecycle is managed by a background scheduler engine that
+      ticks every 60 seconds, evaluates cron expressions, and launches
+      executions in parallel with configurable concurrency limits.
+    </p>
+
+    <h2>Creating a Schedule</h2>
+
+    <p>
+      Navigate to the <strong>Schedules</strong> section in the sidebar and
+      click <strong>New Schedule</strong>. The schedule builder walks you
+      through:
+    </p>
+
+    <ol>
+      <li>
+        <strong>Name:</strong> A descriptive name for the schedule (e.g.,
+        "Weekly Blog Post", "Daily Report").
+      </li>
+      <li>
+        <strong>Team:</strong> Select which agent team will execute the task.
+        The team must already exist.
+      </li>
+      <li>
+        <strong>Prompt:</strong> The instruction sent to the team leader when
+        the schedule fires. Write it as you would in the chat interface.
+      </li>
+      <li>
+        <strong>Frequency:</strong> Use the visual builder to pick hourly,
+        daily, weekly, or monthly cadences. The builder generates the
+        cron expression for you.
+      </li>
+      <li>
+        <strong>Timezone:</strong> Schedules evaluate cron expressions in the
+        selected timezone. Your browser timezone is auto-detected, but you can
+        change it.
+      </li>
+    </ol>
+
+    <h2>Frequency Builder</h2>
+
+    <p>
+      The visual frequency builder simplifies cron expression creation. You
+      don't need to know cron syntax — just pick the pattern:
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Frequency</th>
+          <th>Options</th>
+          <th>Example cron</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Hourly</strong></td>
+          <td>Runs once per hour at a fixed minute</td>
+          <td><code>0 * * * *</code></td>
+        </tr>
+        <tr>
+          <td><strong>Daily</strong></td>
+          <td>Runs once per day at a specific time</td>
+          <td><code>30 9 * * *</code></td>
+        </tr>
+        <tr>
+          <td><strong>Weekly</strong></td>
+          <td>Pick one or more days of the week and a time</td>
+          <td><code>0 10 * * 1,3,5</code></td>
+        </tr>
+        <tr>
+          <td><strong>Monthly</strong></td>
+          <td>Pick a day of the month and a time</td>
+          <td><code>0 8 1 * *</code></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+      The generated cron expression is displayed as a live preview in
+      human-readable format (e.g., "Every Monday, Wednesday, Friday at 10:00").
+    </p>
+
+    <h2>Managing Schedules</h2>
+
+    <h3>Enable / Disable</h3>
+
+    <p>
+      Each schedule has a toggle to enable or disable it. Disabled schedules
+      are not evaluated by the scheduler engine. When re-enabled, the next run
+      time is recalculated automatically.
+    </p>
+
+    <h3>Editing</h3>
+
+    <p>
+      Click any schedule to edit its name, prompt, team, frequency, or
+      timezone. Changes take effect immediately — the next run time is
+      recalculated on save.
+    </p>
+
+    <h3>Deleting</h3>
+
+    <p>
+      Deleting a schedule removes it and all its run history permanently.
+    </p>
+
+    <h2>Run History</h2>
+
+    <p>
+      Each schedule maintains a paginated history of all executions. For every
+      run you can see:
+    </p>
+
+    <ul>
+      <li><strong>Status:</strong> success, error, or timeout.</li>
+      <li><strong>Started at / Finished at:</strong> Timestamps in your local timezone.</li>
+      <li><strong>Duration:</strong> How long the execution took.</li>
+      <li><strong>Conversation:</strong> Expand any run to see the full prompt sent and the agent's response, rendered as a mini-chat with Markdown support.</li>
+    </ul>
+
+    <p>
+      You can also navigate directly to the team's chat from any schedule
+      detail page using the chat icon in the header.
+    </p>
+
+    <h2>Configuration</h2>
+
+    <p>
+      The scheduler engine behavior can be tuned with environment variables:
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Variable</th>
+          <th>Default</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>SCHEDULE_TIMEOUT</code></td>
+          <td><code>1h</code></td>
+          <td>Maximum time to wait for a team response before marking the run as timed out. Accepts Go duration strings (e.g., <code>30m</code>, <code>2h</code>).</td>
+        </tr>
+        <tr>
+          <td><code>SCHEDULER_MAX_CONCURRENT</code></td>
+          <td><code>10</code></td>
+          <td>Maximum number of schedules that can execute simultaneously. Excess schedules are deferred to the next tick.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Architecture Notes</h2>
+
+    <ul>
+      <li>
+        The scheduler runs as a background goroutine inside the API server
+        process — no separate service is needed.
+      </li>
+      <li>
+        Schedule claims are <strong>atomic</strong>: the engine uses a
+        database-level compare-and-swap (<code>UPDATE WHERE status = 'idle'</code>)
+        to prevent double-firing when ticks overlap.
+      </li>
+      <li>
+        Executions are isolated: each run deploys a fresh team instance and
+        tears it down after completion, ensuring no state leaks between runs.
+      </li>
+      <li>
+        Panic recovery ensures that a failing execution never crashes the
+        scheduler — the schedule is reset to idle and the error is logged.
+      </li>
+    </ul>
+
+    <h2>Next Steps</h2>
+
+    <ul>
+      <li>
+        <a href="/docs/configuration">Configuration</a>: Review all
+        environment variables including scheduler-specific settings.
+      </li>
+      <li>
+        <a href="/docs/architecture">Architecture</a>: Understand how the
+        scheduler fits into the overall system design.
+      </li>
+    </ul>
+  </div>
+</DocsLayout>
