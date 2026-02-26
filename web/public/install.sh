@@ -5,7 +5,7 @@ set -euo pipefail
 # Usage: curl -fsSL https://agentcrew.helmcode.com/install.sh | bash
 
 REPO_BASE="https://raw.githubusercontent.com/helmcode/agent_crew_landing/main"
-INSTALL_DIR="agentcrew"
+INSTALL_DIR="$HOME/.agentcrew"
 
 # ── Colors ──────────────────────────────────────────────────────────
 RED='\033[0;31m'
@@ -68,7 +68,7 @@ install() {
   if [[ -d "$INSTALL_DIR" ]]; then
     warn "Directory '$INSTALL_DIR' already exists."
     read -rp "Overwrite configuration? [y/N]: " overwrite </dev/tty
-    if [[ "${overwrite,,}" != "y" ]]; then
+    if [[ "$overwrite" != "y" && "$overwrite" != "Y" ]]; then
       fail "Installation cancelled."
     fi
   fi
