@@ -31,7 +31,11 @@ import DocsLayout from '../../../layouts/DocsLayout.astro';
     <p>
       Todo el ciclo de vida es gestionado por un motor de programacion en segundo plano
       que verifica cada 60 segundos, evalua expresiones cron y lanza ejecuciones en
-      paralelo con limites de concurrencia configurables.
+      paralelo con limites de concurrencia configurables. Cuando multiples tareas
+      apuntan al <strong>mismo equipo</strong>, los mensajes se encolan y procesan
+      secuencialmente (FIFO) — consulta
+      <a href="/es/docs/architecture#modelo-de-procesamiento-de-tareas">Modelo de Procesamiento de Tareas</a>
+      para mas detalles.
     </p>
 
     <h2>Crear una Tarea Programada</h2>
@@ -203,6 +207,13 @@ import DocsLayout from '../../../layouts/DocsLayout.astro';
       <li>
         La recuperacion de panics asegura que una ejecucion fallida nunca crashee
         el programador — la tarea se resetea a idle y el error se registra en los logs.
+      </li>
+      <li>
+        <strong>Procesamiento FIFO por equipo:</strong> Cada equipo ejecuta un
+        unico proceso Claude Code. Cuando multiples tareas programadas apuntan al
+        mismo equipo, los mensajes se encolan y procesan uno a la vez en orden de
+        llegada. Un ID de correlacion asegura que cada ejecutor reciba la respuesta
+        correcta, incluso cuando las tareas se solapan.
       </li>
     </ul>
 

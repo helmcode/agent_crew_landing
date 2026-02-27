@@ -31,7 +31,11 @@ import DocsLayout from '../../layouts/DocsLayout.astro';
     <p>
       The entire lifecycle is managed by a background scheduler engine that
       ticks every 60 seconds, evaluates cron expressions, and launches
-      executions in parallel with configurable concurrency limits.
+      executions in parallel with configurable concurrency limits. When
+      multiple schedules target the <strong>same team</strong>, messages are
+      queued and processed sequentially (FIFO) — see
+      <a href="/docs/architecture#task-processing-model">Task Processing Model</a>
+      for details.
     </p>
 
     <h2>Creating a Schedule</h2>
@@ -201,6 +205,13 @@ import DocsLayout from '../../layouts/DocsLayout.astro';
       <li>
         Panic recovery ensures that a failing execution never crashes the
         scheduler — the schedule is reset to idle and the error is logged.
+      </li>
+      <li>
+        <strong>Per-team FIFO processing:</strong> Each team runs a single
+        Claude Code process. When multiple schedules target the same team,
+        messages are queued and processed one at a time in arrival order. A
+        correlation ID ensures each executor receives the correct response,
+        even when schedules overlap.
       </li>
     </ul>
 

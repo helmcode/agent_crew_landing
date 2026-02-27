@@ -241,6 +241,61 @@ import DocsLayout from '../../layouts/DocsLayout.astro';
       management, and integration with existing cluster infrastructure.
     </p>
 
+    <h2>Task Processing Model</h2>
+
+    <p>
+      Each agent team runs a <strong>single Claude Code process</strong> inside
+      its container. This process reads from stdin and writes to stdout
+      sequentially — it handles one request at a time, in the order received.
+    </p>
+
+    <h3>FIFO Queue</h3>
+
+    <p>
+      When multiple messages arrive concurrently (e.g., two scheduled tasks
+      firing at the same time, or a chat message while a schedule is running),
+      the sidecar forwards each message to Claude Code's stdin immediately.
+      Claude processes them <strong>in FIFO order</strong>: the first message
+      in is the first message answered.
+    </p>
+
+    <p>
+      The sidecar maintains an internal correlation queue to match each
+      response back to the correct request. This ensures that scheduled task A
+      receives the response meant for task A, even if task B was sent moments
+      later.
+    </p>
+
+    <pre><code class="language-text">  Concurrent requests                    Sequential processing
+  ┌──────────────────┐                   ┌─────────────────────┐
+  │ Schedule A ──────┼──▶ stdin ──▶      │ Claude processes A  │
+  │ Schedule B ──────┼──▶ (queued)       │ Claude processes B  │
+  │ Chat message ────┼──▶ (queued)       │ Claude processes C  │
+  └──────────────────┘                   └─────────────────────┘
+
+  Correlation queue: [A, B, Chat]
+  Response A → matched to Schedule A
+  Response B → matched to Schedule B
+  Response C → matched to Chat</code></pre>
+
+    <h3>Why One Process per Team?</h3>
+
+    <p>
+      Claude Code maintains conversational context across messages. Running a
+      single process per team means the agent retains awareness of previous
+      interactions within the same session — a schedule can build on context
+      from earlier messages. This is the same model as running Claude Code in a
+      terminal: one process, one conversation thread.
+    </p>
+
+    <blockquote>
+      <strong>Note:</strong> The scheduler engine itself can launch many
+      executions in parallel (controlled by
+      <code>SCHEDULER_MAX_CONCURRENT</code>), but within each team, messages
+      are processed sequentially. If two schedules target the same team, the
+      second waits for the first to finish.
+    </blockquote>
+
     <h2>Data Flow: Sending a Message</h2>
 
     <p>

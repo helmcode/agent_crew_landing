@@ -240,6 +240,61 @@ import DocsLayout from '../../../layouts/DocsLayout.astro';
       recursos e integracion con infraestructura de cluster existente.
     </p>
 
+    <h2>Modelo de Procesamiento de Tareas</h2>
+
+    <p>
+      Cada equipo de agentes ejecuta un <strong>unico proceso Claude Code</strong> dentro
+      de su contenedor. Este proceso lee de stdin y escribe en stdout
+      secuencialmente — atiende una solicitud a la vez, en el orden recibido.
+    </p>
+
+    <h3>Cola FIFO</h3>
+
+    <p>
+      Cuando llegan multiples mensajes de forma concurrente (por ejemplo, dos tareas
+      programadas disparandose al mismo tiempo, o un mensaje de chat mientras una
+      tarea programada esta en ejecucion), el sidecar reenvia cada mensaje al stdin de
+      Claude Code inmediatamente. Claude los procesa <strong>en orden FIFO</strong>:
+      el primer mensaje en entrar es el primero en ser respondido.
+    </p>
+
+    <p>
+      El sidecar mantiene una cola de correlacion interna para asociar cada
+      respuesta con la solicitud correcta. Esto asegura que la tarea programada A
+      reciba la respuesta destinada a la tarea A, incluso si la tarea B fue enviada
+      momentos despues.
+    </p>
+
+    <pre><code class="language-text">  Solicitudes concurrentes                Procesamiento secuencial
+  ┌──────────────────┐                   ┌─────────────────────┐
+  │ Tarea A ─────────┼──▶ stdin ──▶      │ Claude procesa A    │
+  │ Tarea B ─────────┼──▶ (en cola)      │ Claude procesa B    │
+  │ Mensaje chat ────┼──▶ (en cola)      │ Claude procesa C    │
+  └──────────────────┘                   └─────────────────────┘
+
+  Cola de correlacion: [A, B, Chat]
+  Respuesta A → asociada a Tarea A
+  Respuesta B → asociada a Tarea B
+  Respuesta C → asociada a Chat</code></pre>
+
+    <h3>Por que Un Solo Proceso por Equipo?</h3>
+
+    <p>
+      Claude Code mantiene contexto conversacional entre mensajes. Ejecutar un
+      unico proceso por equipo significa que el agente conserva conocimiento de
+      interacciones previas dentro de la misma sesion — una tarea programada puede
+      aprovechar el contexto de mensajes anteriores. Es el mismo modelo que ejecutar
+      Claude Code en una terminal: un proceso, un hilo de conversacion.
+    </p>
+
+    <blockquote>
+      <strong>Nota:</strong> El motor de programacion puede lanzar muchas
+      ejecuciones en paralelo (controlado por
+      <code>SCHEDULER_MAX_CONCURRENT</code>), pero dentro de cada equipo los mensajes
+      se procesan secuencialmente. Si dos tareas programadas apuntan al mismo equipo,
+      la segunda espera a que la primera termine.
+    </blockquote>
+
     <h2>Flujo de Datos: Enviar un Mensaje</h2>
 
     <p>
