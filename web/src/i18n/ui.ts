@@ -24,7 +24,7 @@ export const ui: Record<Lang, Record<string, string>> = {
     'footer.roadmap': 'Roadmap',
     'footer.bookCall': 'Book a Call',
     'footer.helmcode': 'Helmcode.com',
-    'footer.copyright': '2025 AgentCrew. Built by',
+    'footer.copyright': '2026 AgentCrew. Built by',
     'footer.openSource': 'Open Source',
 
     // Contact Form
@@ -74,7 +74,7 @@ export const ui: Record<Lang, Record<string, string>> = {
     'footer.roadmap': 'Hoja de Ruta',
     'footer.bookCall': 'Agendar Llamada',
     'footer.helmcode': 'Helmcode.com',
-    'footer.copyright': '2025 AgentCrew. Creado por',
+    'footer.copyright': '2026 AgentCrew. Creado por',
     'footer.openSource': 'Codigo Abierto',
 
     // Contact Form
