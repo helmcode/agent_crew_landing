@@ -39,7 +39,7 @@ import DocsLayout from '../../../layouts/DocsLayout.astro';
 │                    │  └──────┬──────┘  │                        │
 │                    │         │         │                        │
 │                    │  ┌──────▼──────┐  │                        │
-│                    │  │ Claude Code  │  │                        │
+│                    │  │ AI Provider  │  │                        │
 │                    │  │    CLI       │  │                        │
 │                    │  └─────────────┘  │                        │
 │                    │                   │                        │
@@ -94,8 +94,9 @@ import DocsLayout from '../../../layouts/DocsLayout.astro';
     <h2>Internos del Contenedor de Agentes</h2>
 
     <p>
-      El lider de cada equipo se ejecuta dentro de un contenedor Docker basado en la
-      imagen <code>ghcr.io/helmcode/agent_crew_agent</code>. El contenedor
+      El lider de cada equipo se ejecuta dentro de un contenedor Docker basado en una
+      imagen especifica del proveedor (<code>agent_crew_agent</code> para Claude Code,
+      <code>agent_crew_opencode_agent</code> para OpenCode). El contenedor
       incluye varios componentes:
     </p>
 
@@ -103,25 +104,25 @@ import DocsLayout from '../../../layouts/DocsLayout.astro';
 
     <p>
       El sidecar es un proceso ligero que conecta los mensajes NATS con la
-      interfaz stdin/stdout de Claude Code. Este:
+      interfaz del proveedor de IA. Este:
     </p>
 
     <ol>
       <li>Se suscribe al subject NATS del equipo para mensajes entrantes.</li>
-      <li>Escribe los mensajes entrantes en el stdin de Claude Code.</li>
-      <li>Lee el stdout de Claude Code y publica las respuestas de vuelta a NATS.</li>
+      <li>Reenvia los mensajes entrantes al proveedor de IA (stdin para Claude Code, API HTTP para OpenCode).</li>
+      <li>Lee la salida del proveedor y publica las respuestas de vuelta a NATS.</li>
     </ol>
 
     <p>
-      Este diseno mantiene a Claude Code sin conocimiento de la infraestructura de mensajeria.
-      Simplemente lee de stdin y escribe en stdout, mientras que el sidecar
-      maneja toda la comunicacion de red.
+      Este diseno mantiene al proveedor de IA sin conocimiento de la infraestructura de mensajeria.
+      El sidecar maneja toda la comunicacion de red, abstrayendo las diferencias
+      entre proveedores detras de una interfaz unificada.
     </p>
 
     <h3>CLI de Skills</h3>
 
     <p>
-      Antes de que Claude Code inicie, el contenedor ejecuta el paso de instalacion
+      Antes de que el proveedor de IA inicie, el contenedor ejecuta el paso de instalacion
       de habilidades. Itera sobre las habilidades configuradas para el equipo e instala
       cada una usando el comando <code>npx skills add</code>. Las habilidades se
       colocan en <code>.agents/skills/</code> con enlaces simbolicos creados en
@@ -211,7 +212,7 @@ import DocsLayout from '../../../layouts/DocsLayout.astro';
         </tr>
         <tr>
           <td><strong>Contenedor del Lider</strong></td>
-          <td>El contenedor del agente ejecutando el proceso sidecar y el CLI de Claude Code.</td>
+          <td>El contenedor del agente ejecutando el proceso sidecar y el CLI del proveedor de IA.</td>
         </tr>
       </tbody>
     </table>
@@ -243,9 +244,9 @@ import DocsLayout from '../../../layouts/DocsLayout.astro';
     <h2>Modelo de Procesamiento de Tareas</h2>
 
     <p>
-      Cada equipo de agentes ejecuta un <strong>unico proceso Claude Code</strong> dentro
-      de su contenedor. Este proceso lee de stdin y escribe en stdout
-      secuencialmente — atiende una solicitud a la vez, en el orden recibido.
+      Cada equipo de agentes ejecuta un <strong>unico proceso de agente IA</strong> dentro
+      de su contenedor. El agente atiende una solicitud a la vez,
+      en el orden recibido.
     </p>
 
     <h3>Cola FIFO</h3>
@@ -253,8 +254,9 @@ import DocsLayout from '../../../layouts/DocsLayout.astro';
     <p>
       Cuando llegan multiples mensajes de forma concurrente (por ejemplo, dos tareas
       programadas disparandose al mismo tiempo, o un mensaje de chat mientras una
-      tarea programada esta en ejecucion), el sidecar reenvia cada mensaje al stdin de
-      Claude Code inmediatamente. Claude los procesa <strong>en orden FIFO</strong>:
+      tarea programada esta en ejecucion), el sidecar encola los mensajes y los envia
+      uno a la vez.
+      El agente los procesa <strong>en orden FIFO</strong>:
       el primer mensaje en entrar es el primero en ser respondido.
     </p>
 
@@ -267,9 +269,9 @@ import DocsLayout from '../../../layouts/DocsLayout.astro';
 
     <pre><code class="language-text">  Solicitudes concurrentes                Procesamiento secuencial
   ┌──────────────────┐                   ┌─────────────────────┐
-  │ Tarea A ─────────┼──▶ stdin ──▶      │ Claude procesa A    │
-  │ Tarea B ─────────┼──▶ (en cola)      │ Claude procesa B    │
-  │ Mensaje chat ────┼──▶ (en cola)      │ Claude procesa C    │
+  │ Tarea A ─────────┼──▶ stdin ──▶      │ Agente procesa A    │
+  │ Tarea B ─────────┼──▶ (en cola)      │ Agente procesa B    │
+  │ Mensaje chat ────┼──▶ (en cola)      │ Agente procesa C    │
   └──────────────────┘                   └─────────────────────┘
 
   Cola de correlacion: [A, B, Chat]
@@ -280,11 +282,10 @@ import DocsLayout from '../../../layouts/DocsLayout.astro';
     <h3>Por que Un Solo Proceso por Equipo?</h3>
 
     <p>
-      Claude Code mantiene contexto conversacional entre mensajes. Ejecutar un
+      El proveedor de IA mantiene contexto conversacional entre mensajes. Ejecutar un
       unico proceso por equipo significa que el agente conserva conocimiento de
       interacciones previas dentro de la misma sesion — una tarea programada puede
-      aprovechar el contexto de mensajes anteriores. Es el mismo modelo que ejecutar
-      Claude Code en una terminal: un proceso, un hilo de conversacion.
+      aprovechar el contexto de mensajes anteriores. Un proceso, un hilo de conversacion.
     </p>
 
     <blockquote>
@@ -306,10 +307,10 @@ import DocsLayout from '../../../layouts/DocsLayout.astro';
       <li>El frontend envia el mensaje al servidor API via HTTP/WebSocket.</li>
       <li>El servidor API publica el mensaje en el subject NATS del equipo.</li>
       <li>El proceso sidecar dentro del contenedor del agente recibe el mensaje NATS.</li>
-      <li>El sidecar escribe el mensaje en el stdin de Claude Code.</li>
-      <li>Claude Code procesa la solicitud, potencialmente delegando a sub-agentes trabajadores.</li>
-      <li>Claude Code escribe las respuestas en stdout.</li>
-      <li>El sidecar lee stdout y publica fragmentos de respuesta en NATS.</li>
+      <li>El sidecar reenvia el mensaje al proveedor de IA.</li>
+      <li>El agente de IA procesa la solicitud, potencialmente delegando a sub-agentes trabajadores.</li>
+      <li>El agente produce la salida de respuesta.</li>
+      <li>El sidecar lee la salida y publica fragmentos de respuesta en NATS.</li>
       <li>El servidor API recibe los mensajes NATS y los reenvia al frontend.</li>
       <li>El frontend renderiza la respuesta en tiempo real a medida que llegan los fragmentos.</li>
     </ol>

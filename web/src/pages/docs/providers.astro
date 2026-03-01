@@ -1,0 +1,163 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+---
+
+<DocsLayout title="Providers | AgentCrew" lang="en">
+  <div class="docs-prose">
+    <h1>Providers</h1>
+
+    <p>
+      AgentCrew supports multiple AI agent providers. A provider determines
+      which CLI and container image are used to run your agents. The platform
+      features — teams, agents, skills, schedules, chat, and workspaces — work
+      identically regardless of which provider you choose.
+    </p>
+
+    <h2>Available Providers</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Provider</th>
+          <th>CLI</th>
+          <th>Agent Image</th>
+          <th>Credentials</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Claude Code</strong></td>
+          <td><code>claude</code></td>
+          <td><code>ghcr.io/helmcode/agent_crew_agent</code></td>
+          <td><code>ANTHROPIC_API_KEY</code> or <code>CLAUDE_CODE_OAUTH_TOKEN</code></td>
+        </tr>
+        <tr>
+          <td><strong>OpenCode</strong></td>
+          <td><code>opencode</code></td>
+          <td><code>ghcr.io/helmcode/agent_crew_opencode_agent</code></td>
+          <td><code>OPENCODE_API_KEY</code></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Choosing a Provider</h2>
+
+    <p>
+      When creating a team, you select the provider in <strong>Step 1</strong>
+      of the creation wizard. The provider determines which container image is
+      deployed and which CLI handles the AI interaction inside the container.
+    </p>
+
+    <p>
+      You can run multiple teams simultaneously with different providers. For
+      example, one team using Claude Code and another using OpenCode — they
+      operate independently.
+    </p>
+
+    <h2>Claude Code</h2>
+
+    <p>
+      <a href="https://docs.anthropic.com/en/docs/claude-code" target="_blank" rel="noopener">Claude Code</a>
+      is Anthropic's official agentic coding tool. It runs as a CLI process
+      that reads from stdin and writes to stdout. The sidecar bridges NATS
+      messages to this stdin/stdout interface.
+    </p>
+
+    <h3>Credentials</h3>
+
+    <p>
+      Claude Code requires one of the following credentials, configured in the
+      <strong>Settings</strong> page:
+    </p>
+
+    <ul>
+      <li><strong>ANTHROPIC_API_KEY</strong>: Your Anthropic API key from <a href="https://console.anthropic.com/" target="_blank" rel="noopener">console.anthropic.com</a>.</li>
+      <li><strong>CLAUDE_CODE_OAUTH_TOKEN</strong>: An OAuth token for Claude Code. If both are set, the API key takes precedence.</li>
+    </ul>
+
+    <h2>OpenCode</h2>
+
+    <p>
+      <a href="https://opencode.ai" target="_blank" rel="noopener">OpenCode</a>
+      is an open-source terminal-based AI assistant. It runs as an HTTP server
+      (<code>opencode serve</code>) and the sidecar communicates with it via
+      REST API and SSE (Server-Sent Events) for streaming responses.
+    </p>
+
+    <h3>Credentials</h3>
+
+    <p>
+      OpenCode requires the following credential in the
+      <strong>Settings</strong> page:
+    </p>
+
+    <ul>
+      <li><strong>OPENCODE_API_KEY</strong>: Your API key for the AI model provider configured in OpenCode (e.g., an Anthropic API key).</li>
+    </ul>
+
+    <h2>What Stays the Same</h2>
+
+    <p>
+      Regardless of provider, all platform features work identically:
+    </p>
+
+    <ul>
+      <li><strong>Teams and agents</strong>: Leader/worker model, Markdown-driven specialization.</li>
+      <li><strong>Skills</strong>: Install and manage skills the same way.</li>
+      <li><strong>Schedules</strong>: Cron-based task automation works across providers.</li>
+      <li><strong>Chat</strong>: Real-time messaging, activity feed, and message history.</li>
+      <li><strong>Workspaces</strong>: Shared <code>/workspace</code> directory with project files.</li>
+    </ul>
+
+    <h2>What Differs</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Aspect</th>
+          <th>Claude Code</th>
+          <th>OpenCode</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Container image</td>
+          <td><code>agent_crew_agent</code></td>
+          <td><code>agent_crew_opencode_agent</code></td>
+        </tr>
+        <tr>
+          <td>Communication</td>
+          <td>stdin/stdout (blocking)</td>
+          <td>HTTP REST + SSE (async)</td>
+        </tr>
+        <tr>
+          <td>Credential key</td>
+          <td><code>ANTHROPIC_API_KEY</code></td>
+          <td><code>OPENCODE_API_KEY</code></td>
+        </tr>
+        <tr>
+          <td>Instructions file</td>
+          <td><code>.claude/CLAUDE.md</code></td>
+          <td><code>.opencode/AGENTS.MD</code></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Next Steps</h2>
+
+    <ul>
+      <li>
+        <a href="/docs/quick-start">Quick Start</a>: Get AgentCrew running
+        and create your first team with any provider.
+      </li>
+      <li>
+        <a href="/docs/configuration">Configuration</a>: Review all
+        credential and environment variable options.
+      </li>
+      <li>
+        <a href="/docs/architecture">Architecture</a>: Understand how the
+        sidecar abstracts provider differences.
+      </li>
+    </ul>
+  </div>
+</DocsLayout>

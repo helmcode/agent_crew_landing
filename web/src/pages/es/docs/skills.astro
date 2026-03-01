@@ -16,7 +16,7 @@ import DocsLayout from '../../../layouts/DocsLayout.astro';
     <h2>Como Funcionan las Habilidades</h2>
 
     <p>
-      Internamente, las habilidades se instalan usando el CLI de skills de Claude Code:
+      Internamente, las habilidades se instalan usando el CLI de skills:
     </p>
 
     <pre><code class="language-bash">npx skills add &lt;github_repo_url&gt; --skill &lt;skill_name&gt; --agent claude-code -y</code></pre>
@@ -24,7 +24,7 @@ import DocsLayout from '../../../layouts/DocsLayout.astro';
     <p>
       Este comando obtiene la definicion de la habilidad de un repositorio de GitHub y
       la instala en el entorno del agente. Una vez instalada, la habilidad
-      se convierte en parte de las capacidades disponibles del agente y Claude Code puede
+      se convierte en parte de las capacidades disponibles del agente y este puede
       usarla automaticamente cuando sea relevante.
     </p>
 
@@ -141,7 +141,7 @@ import DocsLayout from '../../../layouts/DocsLayout.astro';
         </tr>
         <tr>
           <td><code>.claude/skills/</code></td>
-          <td>Contiene enlaces simbolicos que apuntan a <code>.agents/skills/</code>. Asi es como Claude Code descubre y carga las habilidades instaladas.</td>
+          <td>Contiene enlaces simbolicos que apuntan a <code>.agents/skills/</code>. Asi es como el agente de IA descubre y carga las habilidades instaladas.</td>
         </tr>
       </tbody>
     </table>
@@ -150,7 +150,7 @@ import DocsLayout from '../../../layouts/DocsLayout.astro';
       Esta estructura de dos directorios separa el almacenamiento de habilidades del
       descubrimiento de habilidades. El directorio <code>.agents/skills/</code> contiene la fuente
       de verdad, mientras que <code>.claude/skills/</code> proporciona la interfaz que
-      Claude Code espera.
+      el agente espera.
     </p>
 
     <pre><code class="language-text">/workspace/

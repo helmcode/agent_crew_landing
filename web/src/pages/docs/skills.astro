@@ -16,7 +16,7 @@ import DocsLayout from '../../layouts/DocsLayout.astro';
     <h2>How Skills Work</h2>
 
     <p>
-      Under the hood, skills are installed using the Claude Code skills CLI:
+      Under the hood, skills are installed using the skills CLI:
     </p>
 
     <pre><code class="language-bash">npx skills add &lt;github_repo_url&gt; --skill &lt;skill_name&gt; --agent claude-code -y</code></pre>
@@ -24,7 +24,7 @@ import DocsLayout from '../../layouts/DocsLayout.astro';
     <p>
       This command fetches the skill definition from a GitHub repository and
       installs it into the agent's environment. Once installed, the skill
-      becomes part of the agent's available capabilities and Claude Code can
+      becomes part of the agent's available capabilities and the agent can
       use it automatically when relevant.
     </p>
 
@@ -141,7 +141,7 @@ import DocsLayout from '../../layouts/DocsLayout.astro';
         </tr>
         <tr>
           <td><code>.claude/skills/</code></td>
-          <td>Contains symlinks pointing to <code>.agents/skills/</code>. This is how Claude Code discovers and loads installed skills.</td>
+          <td>Contains symlinks pointing to <code>.agents/skills/</code>. This is how the AI agent discovers and loads installed skills.</td>
         </tr>
       </tbody>
     </table>
@@ -150,7 +150,7 @@ import DocsLayout from '../../layouts/DocsLayout.astro';
       This two-directory structure separates skill storage from skill
       discovery. The <code>.agents/skills/</code> directory holds the source of
       truth, while <code>.claude/skills/</code> provides the interface that
-      Claude Code expects.
+      the agent expects.
     </p>
 
     <pre><code class="language-text">/workspace/

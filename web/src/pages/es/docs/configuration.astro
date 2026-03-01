@@ -108,13 +108,19 @@ SCHEDULER_MAX_CONCURRENT=10</code></pre>
           <td><code>CLAUDE_CODE_OAUTH_TOKEN</code></td>
           <td>Metodo de autenticacion alternativo: un token OAuth para Claude Code. Usalo si prefieres OAuth en lugar de autenticacion por clave API. Solo uno de los dos es requerido.</td>
         </tr>
+        <tr>
+          <td><code>OPENCODE_API_KEY</code></td>
+          <td>Tu clave API para equipos basados en OpenCode. Requerida al crear equipos con el proveedor OpenCode. Generalmente es una clave API de Anthropic utilizada internamente por OpenCode.</td>
+        </tr>
       </tbody>
     </table>
 
     <blockquote>
-      <strong>Nota:</strong> Debes proporcionar <code>ANTHROPIC_API_KEY</code>
-      o <code>CLAUDE_CODE_OAUTH_TOKEN</code>. Si ambos estan configurados, la clave API
-      tiene precedencia.
+      <strong>Nota:</strong> Solo necesitas credenciales para los proveedores
+      que uses. Los equipos Claude Code requieren <code>ANTHROPIC_API_KEY</code>
+      o <code>CLAUDE_CODE_OAUTH_TOKEN</code>. Los equipos OpenCode requieren
+      <code>OPENCODE_API_KEY</code>. Consulta <a href="/es/docs/providers">Proveedores</a>
+      para mas detalles.
     </blockquote>
 
     <h2>Ruta del Espacio de Trabajo</h2>

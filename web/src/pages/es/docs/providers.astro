@@ -1,0 +1,165 @@
+---
+import DocsLayout from '../../../layouts/DocsLayout.astro';
+---
+
+<DocsLayout title="Proveedores | AgentCrew" lang="es">
+  <div class="docs-prose">
+    <h1>Proveedores</h1>
+
+    <p>
+      AgentCrew soporta multiples proveedores de agentes IA. Un proveedor
+      determina que CLI e imagen de contenedor se utilizan para ejecutar tus
+      agentes. Las funcionalidades de la plataforma — equipos, agentes,
+      habilidades, tareas programadas, chat y workspaces — funcionan de forma
+      identica independientemente del proveedor que elijas.
+    </p>
+
+    <h2>Proveedores Disponibles</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Proveedor</th>
+          <th>CLI</th>
+          <th>Imagen del Agente</th>
+          <th>Credenciales</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Claude Code</strong></td>
+          <td><code>claude</code></td>
+          <td><code>ghcr.io/helmcode/agent_crew_agent</code></td>
+          <td><code>ANTHROPIC_API_KEY</code> o <code>CLAUDE_CODE_OAUTH_TOKEN</code></td>
+        </tr>
+        <tr>
+          <td><strong>OpenCode</strong></td>
+          <td><code>opencode</code></td>
+          <td><code>ghcr.io/helmcode/agent_crew_opencode_agent</code></td>
+          <td><code>OPENCODE_API_KEY</code></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Elegir un Proveedor</h2>
+
+    <p>
+      Al crear un equipo, seleccionas el proveedor en el <strong>Paso 1</strong>
+      del asistente de creacion. El proveedor determina que imagen de contenedor
+      se despliega y que CLI gestiona la interaccion con la IA dentro del contenedor.
+    </p>
+
+    <p>
+      Puedes ejecutar multiples equipos simultaneamente con diferentes proveedores.
+      Por ejemplo, un equipo usando Claude Code y otro usando OpenCode — funcionan
+      de forma independiente.
+    </p>
+
+    <h2>Claude Code</h2>
+
+    <p>
+      <a href="https://docs.anthropic.com/en/docs/claude-code" target="_blank" rel="noopener">Claude Code</a>
+      es la herramienta oficial de codificacion agente de Anthropic. Se ejecuta
+      como un proceso CLI que lee de stdin y escribe en stdout. El sidecar conecta
+      los mensajes NATS a esta interfaz stdin/stdout.
+    </p>
+
+    <h3>Credenciales</h3>
+
+    <p>
+      Claude Code requiere una de las siguientes credenciales, configuradas en la
+      pagina de <strong>Settings</strong>:
+    </p>
+
+    <ul>
+      <li><strong>ANTHROPIC_API_KEY</strong>: Tu clave API de Anthropic desde <a href="https://console.anthropic.com/" target="_blank" rel="noopener">console.anthropic.com</a>.</li>
+      <li><strong>CLAUDE_CODE_OAUTH_TOKEN</strong>: Un token OAuth para Claude Code. Si ambos estan configurados, la clave API tiene prioridad.</li>
+    </ul>
+
+    <h2>OpenCode</h2>
+
+    <p>
+      <a href="https://opencode.ai" target="_blank" rel="noopener">OpenCode</a>
+      es un asistente de IA de codigo abierto basado en terminal. Se ejecuta como
+      un servidor HTTP (<code>opencode serve</code>) y el sidecar se comunica con
+      el mediante API REST y SSE (Server-Sent Events) para respuestas en streaming.
+    </p>
+
+    <h3>Credenciales</h3>
+
+    <p>
+      OpenCode requiere la siguiente credencial en la pagina de
+      <strong>Settings</strong>:
+    </p>
+
+    <ul>
+      <li><strong>OPENCODE_API_KEY</strong>: Tu clave API para el proveedor de modelos de IA configurado en OpenCode (por ejemplo, una clave API de Anthropic).</li>
+    </ul>
+
+    <h2>Lo que se Mantiene Igual</h2>
+
+    <p>
+      Independientemente del proveedor, todas las funcionalidades de la plataforma
+      funcionan de forma identica:
+    </p>
+
+    <ul>
+      <li><strong>Equipos y agentes</strong>: Modelo lider/trabajadores, especializacion basada en Markdown.</li>
+      <li><strong>Habilidades</strong>: Instala y gestiona habilidades de la misma manera.</li>
+      <li><strong>Tareas programadas</strong>: La automatizacion con cron funciona en todos los proveedores.</li>
+      <li><strong>Chat</strong>: Mensajeria en tiempo real, feed de actividad e historial de mensajes.</li>
+      <li><strong>Workspaces</strong>: Directorio compartido <code>/workspace</code> con archivos del proyecto.</li>
+    </ul>
+
+    <h2>Lo que Difiere</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Aspecto</th>
+          <th>Claude Code</th>
+          <th>OpenCode</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Imagen del contenedor</td>
+          <td><code>agent_crew_agent</code></td>
+          <td><code>agent_crew_opencode_agent</code></td>
+        </tr>
+        <tr>
+          <td>Comunicacion</td>
+          <td>stdin/stdout (bloqueante)</td>
+          <td>HTTP REST + SSE (asincrono)</td>
+        </tr>
+        <tr>
+          <td>Clave de credencial</td>
+          <td><code>ANTHROPIC_API_KEY</code></td>
+          <td><code>OPENCODE_API_KEY</code></td>
+        </tr>
+        <tr>
+          <td>Archivo de instrucciones</td>
+          <td><code>.claude/CLAUDE.md</code></td>
+          <td><code>.opencode/AGENTS.MD</code></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Siguientes Pasos</h2>
+
+    <ul>
+      <li>
+        <a href="/es/docs/quick-start">Inicio Rapido</a>: Pon en marcha
+        AgentCrew y crea tu primer equipo con cualquier proveedor.
+      </li>
+      <li>
+        <a href="/es/docs/configuration">Configuracion</a>: Revisa todas las
+        opciones de credenciales y variables de entorno.
+      </li>
+      <li>
+        <a href="/es/docs/architecture">Arquitectura</a>: Comprende como el
+        sidecar abstrae las diferencias entre proveedores.
+      </li>
+    </ul>
+  </div>
+</DocsLayout>

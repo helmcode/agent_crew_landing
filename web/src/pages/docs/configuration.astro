@@ -108,13 +108,19 @@ SCHEDULER_MAX_CONCURRENT=10</code></pre>
           <td><code>CLAUDE_CODE_OAUTH_TOKEN</code></td>
           <td>Alternative authentication method: an OAuth token for Claude Code. Use this if you prefer OAuth over API key authentication. Only one of the two is required.</td>
         </tr>
+        <tr>
+          <td><code>OPENCODE_API_KEY</code></td>
+          <td>Your API key for OpenCode-based teams. Required when creating teams with the OpenCode provider. This is typically an Anthropic API key used by OpenCode internally.</td>
+        </tr>
       </tbody>
     </table>
 
     <blockquote>
-      <strong>Note:</strong> You must provide either <code>ANTHROPIC_API_KEY</code>
-      or <code>CLAUDE_CODE_OAUTH_TOKEN</code>. If both are set, the API key
-      takes precedence.
+      <strong>Note:</strong> You only need credentials for the provider(s) you
+      use. Claude Code teams require <code>ANTHROPIC_API_KEY</code> or
+      <code>CLAUDE_CODE_OAUTH_TOKEN</code>. OpenCode teams require
+      <code>OPENCODE_API_KEY</code>. See <a href="/docs/providers">Providers</a>
+      for details.
     </blockquote>
 
     <h2>Workspace Path</h2>

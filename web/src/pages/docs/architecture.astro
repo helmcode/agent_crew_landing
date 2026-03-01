@@ -40,7 +40,7 @@ import DocsLayout from '../../layouts/DocsLayout.astro';
 │                    │  └──────┬──────┘  │                        │
 │                    │         │         │                        │
 │                    │  ┌──────▼──────┐  │                        │
-│                    │  │ Claude Code  │  │                        │
+│                    │  │ AI Provider  │  │                        │
 │                    │  │    CLI       │  │                        │
 │                    │  └─────────────┘  │                        │
 │                    │                   │                        │
@@ -95,34 +95,35 @@ import DocsLayout from '../../layouts/DocsLayout.astro';
     <h2>Agent Container Internals</h2>
 
     <p>
-      Each team's leader runs inside a Docker container based on the
-      <code>ghcr.io/helmcode/agent_crew_agent</code> image. The container
+      Each team's leader runs inside a Docker container based on a
+      provider-specific image (<code>agent_crew_agent</code> for Claude Code,
+      <code>agent_crew_opencode_agent</code> for OpenCode). The container
       includes several components:
     </p>
 
     <h3>Sidecar Process</h3>
 
     <p>
-      The sidecar is a lightweight process that bridges NATS messages to Claude
-      Code's stdin/stdout interface. It:
+      The sidecar is a lightweight process that bridges NATS messages to the
+      AI provider's interface. It:
     </p>
 
     <ol>
       <li>Subscribes to the team's NATS subject for incoming messages.</li>
-      <li>Writes incoming messages to Claude Code's stdin.</li>
-      <li>Reads Claude Code's stdout and publishes responses back to NATS.</li>
+      <li>Forwards incoming messages to the AI provider (stdin for Claude Code, HTTP API for OpenCode).</li>
+      <li>Reads the provider's output and publishes responses back to NATS.</li>
     </ol>
 
     <p>
-      This design keeps Claude Code unaware of the messaging infrastructure.
-      It simply reads from stdin and writes to stdout, while the sidecar
-      handles all network communication.
+      This design keeps the AI provider unaware of the messaging infrastructure.
+      The sidecar handles all network communication, abstracting the differences
+      between providers behind a unified interface.
     </p>
 
     <h3>Skills CLI</h3>
 
     <p>
-      Before Claude Code starts, the container runs the skills installation
+      Before the AI provider starts, the container runs the skills installation
       step. It iterates over the configured skills for the team and installs
       each one using the <code>npx skills add</code> command. Skills are
       placed in <code>.agents/skills/</code> with symlinks created in
@@ -212,7 +213,7 @@ import DocsLayout from '../../layouts/DocsLayout.astro';
         </tr>
         <tr>
           <td><strong>Leader Container</strong></td>
-          <td>The agent container running the sidecar process and Claude Code CLI.</td>
+          <td>The agent container running the sidecar process and the AI provider CLI.</td>
         </tr>
       </tbody>
     </table>
@@ -244,9 +245,9 @@ import DocsLayout from '../../layouts/DocsLayout.astro';
     <h2>Task Processing Model</h2>
 
     <p>
-      Each agent team runs a <strong>single Claude Code process</strong> inside
-      its container. This process reads from stdin and writes to stdout
-      sequentially — it handles one request at a time, in the order received.
+      Each agent team runs a <strong>single AI agent process</strong> inside
+      its container. The agent handles one request at a time, in the order
+      received.
     </p>
 
     <h3>FIFO Queue</h3>
@@ -254,8 +255,8 @@ import DocsLayout from '../../layouts/DocsLayout.astro';
     <p>
       When multiple messages arrive concurrently (e.g., two scheduled tasks
       firing at the same time, or a chat message while a schedule is running),
-      the sidecar forwards each message to Claude Code's stdin immediately.
-      Claude processes them <strong>in FIFO order</strong>: the first message
+      the sidecar queues messages and sends them one at a time.
+      The agent processes them <strong>in FIFO order</strong>: the first message
       in is the first message answered.
     </p>
 
@@ -281,11 +282,10 @@ import DocsLayout from '../../layouts/DocsLayout.astro';
     <h3>Why One Process per Team?</h3>
 
     <p>
-      Claude Code maintains conversational context across messages. Running a
-      single process per team means the agent retains awareness of previous
+      The AI provider maintains conversational context across messages. Running
+      a single process per team means the agent retains awareness of previous
       interactions within the same session — a schedule can build on context
-      from earlier messages. This is the same model as running Claude Code in a
-      terminal: one process, one conversation thread.
+      from earlier messages. One process, one conversation thread.
     </p>
 
     <blockquote>
@@ -307,10 +307,10 @@ import DocsLayout from '../../layouts/DocsLayout.astro';
       <li>The frontend sends the message to the API server via HTTP/WebSocket.</li>
       <li>The API server publishes the message to the team's NATS subject.</li>
       <li>The sidecar process inside the agent container receives the NATS message.</li>
-      <li>The sidecar writes the message to Claude Code's stdin.</li>
-      <li>Claude Code processes the request, potentially delegating to worker sub-agents.</li>
-      <li>Claude Code writes responses to stdout.</li>
-      <li>The sidecar reads stdout and publishes response chunks to NATS.</li>
+      <li>The sidecar forwards the message to the AI provider.</li>
+      <li>The AI agent processes the request, potentially delegating to worker sub-agents.</li>
+      <li>The agent produces response output.</li>
+      <li>The sidecar reads the output and publishes response chunks to NATS.</li>
       <li>The API server receives NATS messages and forwards them to the frontend.</li>
       <li>The frontend renders the response in real time as chunks arrive.</li>
     </ol>
