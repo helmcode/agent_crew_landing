@@ -35,7 +35,7 @@ import DocsLayout from '../../layouts/DocsLayout.astro';
           <td><strong>OpenCode</strong></td>
           <td><code>opencode</code></td>
           <td><code>ghcr.io/helmcode/agent_crew_opencode_agent</code></td>
-          <td><code>OPENCODE_API_KEY</code></td>
+          <td>Standard provider keys (see below)</td>
         </tr>
       </tbody>
     </table>
@@ -87,13 +87,21 @@ import DocsLayout from '../../layouts/DocsLayout.astro';
     <h3>Credentials</h3>
 
     <p>
-      OpenCode requires the following credential in the
-      <strong>Settings</strong> page:
+      OpenCode supports <a href="https://opencode.ai/docs/providers" target="_blank" rel="noopener">75+ LLM providers</a>.
+      Configure the API key for your chosen model provider in the
+      <strong>Settings</strong> page. At least one must be set:
     </p>
 
     <ul>
-      <li><strong>OPENCODE_API_KEY</strong>: Your API key for the AI model provider configured in OpenCode (e.g., an Anthropic API key).</li>
+      <li><strong>ANTHROPIC_API_KEY</strong>: For Anthropic models (Claude Sonnet, Opus, Haiku, etc.).</li>
+      <li><strong>OPENAI_API_KEY</strong>: For OpenAI models (GPT-4o, o3, etc.).</li>
+      <li><strong>GOOGLE_GENERATIVE_AI_API_KEY</strong>: For Google models (Gemini, etc.).</li>
     </ul>
+
+    <p>
+      Local model servers are also supported via <code>OLLAMA_BASE_URL</code> or
+      <code>LM_STUDIO_BASE_URL</code>.
+    </p>
 
     <h2>What Stays the Same</h2>
 
@@ -131,9 +139,9 @@ import DocsLayout from '../../layouts/DocsLayout.astro';
           <td>HTTP REST + SSE (async)</td>
         </tr>
         <tr>
-          <td>Credential key</td>
+          <td>Credential keys</td>
           <td><code>ANTHROPIC_API_KEY</code></td>
-          <td><code>OPENCODE_API_KEY</code></td>
+          <td><code>ANTHROPIC_API_KEY</code>, <code>OPENAI_API_KEY</code>, <code>GOOGLE_GENERATIVE_AI_API_KEY</code>, or local URLs</td>
         </tr>
         <tr>
           <td>Instructions file</td>

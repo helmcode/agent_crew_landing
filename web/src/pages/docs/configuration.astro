@@ -102,15 +102,19 @@ SCHEDULER_MAX_CONCURRENT=10</code></pre>
       <tbody>
         <tr>
           <td><code>ANTHROPIC_API_KEY</code></td>
-          <td>Your Anthropic API key for Claude Code. Obtain one from <a href="https://console.anthropic.com/" target="_blank" rel="noopener">console.anthropic.com</a>. Required unless you use an OAuth token instead.</td>
+          <td>Your Anthropic API key from <a href="https://console.anthropic.com/" target="_blank" rel="noopener">console.anthropic.com</a>. Used by Claude Code teams (required unless you use an OAuth token) and by OpenCode teams when running Anthropic models.</td>
         </tr>
         <tr>
           <td><code>CLAUDE_CODE_OAUTH_TOKEN</code></td>
           <td>Alternative authentication method: an OAuth token for Claude Code. Use this if you prefer OAuth over API key authentication. Only one of the two is required.</td>
         </tr>
         <tr>
-          <td><code>OPENCODE_API_KEY</code></td>
-          <td>Your API key for OpenCode-based teams. Required when creating teams with the OpenCode provider. This is typically an Anthropic API key used by OpenCode internally.</td>
+          <td><code>OPENAI_API_KEY</code></td>
+          <td>Your OpenAI API key. Required for OpenCode teams using OpenAI models. Also used by Claude Code if configured.</td>
+        </tr>
+        <tr>
+          <td><code>GOOGLE_GENERATIVE_AI_API_KEY</code></td>
+          <td>Your Google AI API key. Required for OpenCode teams using Google models (Gemini, etc.).</td>
         </tr>
       </tbody>
     </table>
@@ -118,9 +122,10 @@ SCHEDULER_MAX_CONCURRENT=10</code></pre>
     <blockquote>
       <strong>Note:</strong> You only need credentials for the provider(s) you
       use. Claude Code teams require <code>ANTHROPIC_API_KEY</code> or
-      <code>CLAUDE_CODE_OAUTH_TOKEN</code>. OpenCode teams require
-      <code>OPENCODE_API_KEY</code>. See <a href="/docs/providers">Providers</a>
-      for details.
+      <code>CLAUDE_CODE_OAUTH_TOKEN</code>. OpenCode teams require at least
+      one model provider key (<code>ANTHROPIC_API_KEY</code>,
+      <code>OPENAI_API_KEY</code>, or <code>GOOGLE_GENERATIVE_AI_API_KEY</code>).
+      See <a href="/docs/providers">Providers</a> for details.
     </blockquote>
 
     <h2>Workspace Path</h2>

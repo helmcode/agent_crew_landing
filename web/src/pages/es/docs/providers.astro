@@ -36,7 +36,7 @@ import DocsLayout from '../../../layouts/DocsLayout.astro';
           <td><strong>OpenCode</strong></td>
           <td><code>opencode</code></td>
           <td><code>ghcr.io/helmcode/agent_crew_opencode_agent</code></td>
-          <td><code>OPENCODE_API_KEY</code></td>
+          <td>Claves estandar del proveedor (ver abajo)</td>
         </tr>
       </tbody>
     </table>
@@ -88,13 +88,21 @@ import DocsLayout from '../../../layouts/DocsLayout.astro';
     <h3>Credenciales</h3>
 
     <p>
-      OpenCode requiere la siguiente credencial en la pagina de
-      <strong>Settings</strong>:
+      OpenCode soporta <a href="https://opencode.ai/docs/providers" target="_blank" rel="noopener">75+ proveedores de LLM</a>.
+      Configura la clave API de tu proveedor de modelos elegido en la
+      pagina de <strong>Settings</strong>. Al menos una debe estar configurada:
     </p>
 
     <ul>
-      <li><strong>OPENCODE_API_KEY</strong>: Tu clave API para el proveedor de modelos de IA configurado en OpenCode (por ejemplo, una clave API de Anthropic).</li>
+      <li><strong>ANTHROPIC_API_KEY</strong>: Para modelos de Anthropic (Claude Sonnet, Opus, Haiku, etc.).</li>
+      <li><strong>OPENAI_API_KEY</strong>: Para modelos de OpenAI (GPT-4o, o3, etc.).</li>
+      <li><strong>GOOGLE_GENERATIVE_AI_API_KEY</strong>: Para modelos de Google (Gemini, etc.).</li>
     </ul>
+
+    <p>
+      Tambien se soportan servidores de modelos locales mediante <code>OLLAMA_BASE_URL</code> o
+      <code>LM_STUDIO_BASE_URL</code>.
+    </p>
 
     <h2>Lo que se Mantiene Igual</h2>
 
@@ -133,9 +141,9 @@ import DocsLayout from '../../../layouts/DocsLayout.astro';
           <td>HTTP REST + SSE (asincrono)</td>
         </tr>
         <tr>
-          <td>Clave de credencial</td>
+          <td>Claves de credencial</td>
           <td><code>ANTHROPIC_API_KEY</code></td>
-          <td><code>OPENCODE_API_KEY</code></td>
+          <td><code>ANTHROPIC_API_KEY</code>, <code>OPENAI_API_KEY</code>, <code>GOOGLE_GENERATIVE_AI_API_KEY</code>, o URLs locales</td>
         </tr>
         <tr>
           <td>Archivo de instrucciones</td>

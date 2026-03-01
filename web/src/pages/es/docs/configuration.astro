@@ -102,15 +102,19 @@ SCHEDULER_MAX_CONCURRENT=10</code></pre>
       <tbody>
         <tr>
           <td><code>ANTHROPIC_API_KEY</code></td>
-          <td>Tu clave API de Anthropic para Claude Code. Obten una en <a href="https://console.anthropic.com/" target="_blank" rel="noopener">console.anthropic.com</a>. Requerida a menos que uses un token OAuth en su lugar.</td>
+          <td>Tu clave API de Anthropic de <a href="https://console.anthropic.com/" target="_blank" rel="noopener">console.anthropic.com</a>. Utilizada por equipos Claude Code (requerida a menos que uses un token OAuth) y por equipos OpenCode cuando ejecutan modelos de Anthropic.</td>
         </tr>
         <tr>
           <td><code>CLAUDE_CODE_OAUTH_TOKEN</code></td>
           <td>Metodo de autenticacion alternativo: un token OAuth para Claude Code. Usalo si prefieres OAuth en lugar de autenticacion por clave API. Solo uno de los dos es requerido.</td>
         </tr>
         <tr>
-          <td><code>OPENCODE_API_KEY</code></td>
-          <td>Tu clave API para equipos basados en OpenCode. Requerida al crear equipos con el proveedor OpenCode. Generalmente es una clave API de Anthropic utilizada internamente por OpenCode.</td>
+          <td><code>OPENAI_API_KEY</code></td>
+          <td>Tu clave API de OpenAI. Requerida para equipos OpenCode que usen modelos de OpenAI. Tambien la utiliza Claude Code si esta configurada.</td>
+        </tr>
+        <tr>
+          <td><code>GOOGLE_GENERATIVE_AI_API_KEY</code></td>
+          <td>Tu clave API de Google AI. Requerida para equipos OpenCode que usen modelos de Google (Gemini, etc.).</td>
         </tr>
       </tbody>
     </table>
@@ -118,9 +122,10 @@ SCHEDULER_MAX_CONCURRENT=10</code></pre>
     <blockquote>
       <strong>Nota:</strong> Solo necesitas credenciales para los proveedores
       que uses. Los equipos Claude Code requieren <code>ANTHROPIC_API_KEY</code>
-      o <code>CLAUDE_CODE_OAUTH_TOKEN</code>. Los equipos OpenCode requieren
-      <code>OPENCODE_API_KEY</code>. Consulta <a href="/es/docs/providers">Proveedores</a>
-      para mas detalles.
+      o <code>CLAUDE_CODE_OAUTH_TOKEN</code>. Los equipos OpenCode requieren al menos
+      una clave de proveedor de modelos (<code>ANTHROPIC_API_KEY</code>,
+      <code>OPENAI_API_KEY</code> o <code>GOOGLE_GENERATIVE_AI_API_KEY</code>).
+      Consulta <a href="/es/docs/providers">Proveedores</a> para mas detalles.
     </blockquote>
 
     <h2>Ruta del Espacio de Trabajo</h2>
