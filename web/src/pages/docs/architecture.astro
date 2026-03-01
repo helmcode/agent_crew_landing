@@ -279,6 +279,46 @@ import DocsLayout from '../../layouts/DocsLayout.astro';
   Response B → matched to Schedule B
   Response C → matched to Chat</code></pre>
 
+    <h3>Queue Implementation per Provider</h3>
+
+    <p>
+      Both providers achieve the same FIFO behavior, but the serialization
+      mechanism differs due to how each CLI accepts input:
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Aspect</th>
+          <th>Claude Code</th>
+          <th>OpenCode</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Interface</td>
+          <td>stdin/stdout</td>
+          <td>HTTP REST + SSE</td>
+        </tr>
+        <tr>
+          <td>SendInput behavior</td>
+          <td>Blocking — the call writes to stdin and waits for the full response on stdout before returning.</td>
+          <td>Non-blocking — the HTTP POST to <code>/prompt_async</code> returns immediately.</td>
+        </tr>
+        <tr>
+          <td>Serialization</td>
+          <td><strong>Natural:</strong> because the call blocks, the next message cannot be sent until the current one finishes.</td>
+          <td><strong>Explicit queue:</strong> the sidecar maintains a <code>busy</code> flag and an in-memory pending queue. When a prompt is in flight, new messages are queued. When the SSE stream emits a <code>result</code> event, the next queued message is drained and sent.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+      In both cases, the bridge layer maintains a shared correlation queue
+      (<code>scheduledRunIDs</code>) that maps each response back to the
+      correct scheduled run, regardless of provider.
+    </p>
+
     <h3>Why One Process per Team?</h3>
 
     <p>

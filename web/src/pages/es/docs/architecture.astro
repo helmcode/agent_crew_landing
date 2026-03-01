@@ -279,6 +279,46 @@ import DocsLayout from '../../../layouts/DocsLayout.astro';
   Respuesta B → asociada a Tarea B
   Respuesta C → asociada a Chat</code></pre>
 
+    <h3>Implementacion de la Cola por Proveedor</h3>
+
+    <p>
+      Ambos proveedores logran el mismo comportamiento FIFO, pero el mecanismo de
+      serializacion difiere segun como cada CLI acepta entrada:
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Aspecto</th>
+          <th>Claude Code</th>
+          <th>OpenCode</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Interfaz</td>
+          <td>stdin/stdout</td>
+          <td>HTTP REST + SSE</td>
+        </tr>
+        <tr>
+          <td>Comportamiento de SendInput</td>
+          <td>Bloqueante — la llamada escribe en stdin y espera la respuesta completa en stdout antes de retornar.</td>
+          <td>No bloqueante — el HTTP POST a <code>/prompt_async</code> retorna inmediatamente.</td>
+        </tr>
+        <tr>
+          <td>Serializacion</td>
+          <td><strong>Natural:</strong> como la llamada bloquea, el siguiente mensaje no puede enviarse hasta que el actual termine.</td>
+          <td><strong>Cola explicita:</strong> el sidecar mantiene un flag <code>busy</code> y una cola pendiente en memoria. Cuando un prompt esta en vuelo, los nuevos mensajes se encolan. Cuando el stream SSE emite un evento <code>result</code>, el siguiente mensaje encolado se drena y se envia.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+      En ambos casos, la capa bridge mantiene una cola de correlacion compartida
+      (<code>scheduledRunIDs</code>) que asocia cada respuesta con la ejecucion
+      programada correcta, independientemente del proveedor.
+    </p>
+
     <h3>Por que Un Solo Proceso por Equipo?</h3>
 
     <p>
