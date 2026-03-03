@@ -54,6 +54,15 @@ check_dependencies() {
   fi
   success "Docker daemon is running"
 
+  # Verify architecture support
+  local host_arch
+  host_arch=$(uname -m)
+  case "$host_arch" in
+    x86_64|amd64)  success "Architecture: x86_64 (amd64)" ;;
+    aarch64|arm64)  success "Architecture: arm64 (aarch64)" ;;
+    *)              warn "Unsupported architecture: $host_arch. AgentCrew images support amd64 and arm64 only." ;;
+  esac
+
   if ! command -v curl &>/dev/null; then
     fail "curl is not installed. Please install curl and try again."
   fi
