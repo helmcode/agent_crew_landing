@@ -40,7 +40,7 @@ import DocsLayout from '../../layouts/DocsLayout.astro';
           <td><code>API_PORT</code></td>
           <td>No</td>
           <td><code>3000</code></td>
-          <td>Port on which the API server listens. Change this if port 3000 is already in use.</td>
+          <td>Port for direct API access (e.g., scripts or automation). The frontend proxies API calls automatically through nginx, so this port is not required for normal usage.</td>
         </tr>
         <tr>
           <td><code>FRONTEND_PORT</code></td>
