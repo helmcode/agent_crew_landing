@@ -1,0 +1,274 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+---
+
+<DocsLayout title="Webhooks | AgentCrew" lang="en">
+  <div class="docs-prose">
+    <h1>Webhooks</h1>
+
+    <p>
+      Webhooks let you trigger agent teams from external systems via HTTP.
+      Define a prompt template with variables, secure it with a token, and
+      call the endpoint from CI/CD pipelines, monitoring alerts, third-party
+      integrations, or any system that can make HTTP requests.
+    </p>
+
+    <h2>Use Cases</h2>
+
+    <ul>
+      <li><strong>CI/CD:</strong> Trigger a code review team when a pull request is opened, or run a deployment checklist after a merge.</li>
+      <li><strong>Alerts:</strong> Route monitoring alerts (PagerDuty, Grafana, Datadog) to an SRE agent team for automated triage.</li>
+      <li><strong>Third-party integrations:</strong> Connect CRM events, form submissions, or Slack slash commands to specialized agent teams.</li>
+      <li><strong>Scheduled external triggers:</strong> Use external schedulers (GitHub Actions cron, AWS EventBridge) to trigger agent workflows with dynamic context.</li>
+    </ul>
+
+    <h2>How Webhooks Work</h2>
+
+    <p>
+      When a webhook is triggered, AgentCrew performs the following steps:
+    </p>
+
+    <ol>
+      <li><strong>Authenticate</strong> the incoming request by verifying the token in the URL.</li>
+      <li><strong>Render</strong> the prompt template by replacing <code>{"{{variables}}"}</code> with values from the request body.</li>
+      <li><strong>Send</strong> the rendered prompt to the team leader via NATS.</li>
+      <li><strong>Respond</strong> immediately (fire-and-forget) or wait for the agent's response (wait-for-response mode).</li>
+      <li><strong>Record</strong> the execution in the webhook's run history.</li>
+    </ol>
+
+    <p>
+      Unlike schedules, webhooks do <strong>not</strong> deploy or tear down teams.
+      The target team must already be running when the webhook is triggered.
+      This design keeps webhook responses fast and avoids container startup latency.
+    </p>
+
+    <h2>Creating a Webhook</h2>
+
+    <p>
+      Navigate to the <strong>Webhooks</strong> section in the sidebar and
+      click <strong>New Webhook</strong>. The webhook builder walks you through:
+    </p>
+
+    <ol>
+      <li>
+        <strong>Name:</strong> A descriptive name for the webhook (e.g.,
+        "PR Review Trigger", "Alert Triage").
+      </li>
+      <li>
+        <strong>Team:</strong> Select which agent team will receive the prompt.
+        The team must already exist.
+      </li>
+      <li>
+        <strong>Prompt Template:</strong> The instruction sent to the team leader
+        when the webhook fires. Use <code>{"{{variable_name}}"}</code> placeholders
+        for dynamic values that will be replaced at trigger time.
+      </li>
+      <li>
+        <strong>Timeout:</strong> Maximum time to wait for a response when using
+        wait-for-response mode. Defaults to the global <code>WEBHOOK_TIMEOUT</code> setting.
+      </li>
+      <li>
+        <strong>Max Concurrent:</strong> Maximum number of simultaneous executions
+        for this webhook. Additional triggers are queued.
+      </li>
+    </ol>
+
+    <p>
+      After creation, a unique token is generated and displayed <strong>once</strong>.
+      Copy and store it securely — it cannot be retrieved again.
+    </p>
+
+    <h2>Triggering a Webhook</h2>
+
+    <p>
+      Send a <code>POST</code> request to the trigger endpoint with the webhook token:
+    </p>
+
+    <pre><code class="language-text">POST /webhook/trigger/:token</code></pre>
+
+    <p>
+      The request body must be JSON with a <code>variables</code> object containing
+      the key-value pairs that match your prompt template placeholders:
+    </p>
+
+    <pre><code class="language-json">{"{"}
+  "variables": {"{"}
+    "pr_title": "Add user authentication",
+    "pr_url": "https://github.com/org/repo/pull/42",
+    "author": "alice"
+  {"}"}
+{"}"}</code></pre>
+
+    <h3>Fire-and-Forget Mode (Default)</h3>
+
+    <p>
+      By default, the webhook returns immediately with a <code>202 Accepted</code>
+      response, confirming the prompt was queued for processing:
+    </p>
+
+    <pre><code class="language-bash">curl -X POST https://your-agentcrew/webhook/trigger/whk_abc123def456 \
+  -H "Content-Type: application/json" \
+  -d '{"{"}
+    "variables": {"{"}
+      "alert_name": "High CPU Usage",
+      "service": "api-server",
+      "severity": "warning"
+    {"}"}
+  {"}"}'
+
+# Response: 202 Accepted
+# {"{"}  "status": "accepted", "run_id": "..." {"}"}</code></pre>
+
+    <h3>Wait-for-Response Mode</h3>
+
+    <p>
+      Add <code>?wait=true</code> to the trigger URL to wait for the agent team's
+      response. The request blocks until the agent responds or the timeout is reached:
+    </p>
+
+    <pre><code class="language-bash">curl -X POST "https://your-agentcrew/webhook/trigger/whk_abc123def456?wait=true" \
+  -H "Content-Type: application/json" \
+  -d '{"{"}
+    "variables": {"{"}
+      "pr_title": "Add user authentication",
+      "pr_url": "https://github.com/org/repo/pull/42"
+    {"}"}
+  {"}"}'
+
+# Response: 200 OK (with agent response)
+# {"{"}  "status": "success", "response": "...", "run_id": "..." {"}"}
+
+# Or: 408 Request Timeout (if timeout is reached)
+# {"{"}  "status": "timeout", "run_id": "..." {"}"}</code></pre>
+
+    <h2>Token Security</h2>
+
+    <ul>
+      <li>
+        Tokens use the <code>whk_</code> prefix for easy identification in logs and
+        configuration.
+      </li>
+      <li>
+        Tokens are <strong>SHA-256 hashed</strong> before storage — the plaintext
+        token is never persisted in the database.
+      </li>
+      <li>
+        The plaintext token is shown <strong>only once</strong> at creation time.
+        If lost, you must regenerate a new token.
+      </li>
+    </ul>
+
+    <h2>Managing Webhooks</h2>
+
+    <h3>Regenerating Tokens</h3>
+
+    <p>
+      If a token is compromised or lost, you can regenerate it from the webhook
+      detail page. The old token is immediately invalidated and a new one is
+      displayed once.
+    </p>
+
+    <h3>Run History</h3>
+
+    <p>
+      Each webhook maintains a paginated history of all executions. For every
+      run you can see:
+    </p>
+
+    <ul>
+      <li><strong>Status:</strong> success, error, or timeout.</li>
+      <li><strong>Started at / Finished at:</strong> Timestamps in your local timezone.</li>
+      <li><strong>Duration:</strong> How long the execution took.</li>
+      <li><strong>Variables:</strong> The variables sent in the trigger request.</li>
+      <li><strong>Conversation:</strong> Expand any run to see the rendered prompt and the agent's response.</li>
+    </ul>
+
+    <h3>Enable / Disable</h3>
+
+    <p>
+      Each webhook has a toggle to enable or disable it. Disabled webhooks
+      return <code>404 Not Found</code> when triggered, preventing accidental
+      executions.
+    </p>
+
+    <h3>Editing</h3>
+
+    <p>
+      Click any webhook to edit its name, prompt template, team, timeout, or
+      max concurrent setting. Changes take effect immediately for subsequent
+      triggers.
+    </p>
+
+    <h3>Deleting</h3>
+
+    <p>
+      Deleting a webhook removes it and all its run history permanently. The
+      token is immediately invalidated.
+    </p>
+
+    <h2>Configuration</h2>
+
+    <p>
+      Webhook behavior can be tuned with environment variables:
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Variable</th>
+          <th>Default</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>WEBHOOK_MAX_CONCURRENT</code></td>
+          <td><code>20</code></td>
+          <td>Global maximum number of webhook executions that can run simultaneously. Excess triggers are queued. Can also be overridden per-webhook.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Architecture Notes</h2>
+
+    <ul>
+      <li>
+        The webhook engine runs as part of the API server process — no separate
+        service is needed.
+      </li>
+      <li>
+        Webhooks require the target team to be <strong>already running</strong>.
+        Unlike schedules, they do not deploy or tear down teams.
+      </li>
+      <li>
+        <strong>Per-team FIFO processing:</strong> When multiple webhooks (or
+        webhooks and chat messages) target the same team, messages are queued
+        and processed one at a time in arrival order. A correlation ID ensures
+        each caller receives the correct response, using the same NATS FIFO
+        correlation mechanism as schedules.
+      </li>
+      <li>
+        Concurrency is controlled at two levels: the global
+        <code>WEBHOOK_MAX_CONCURRENT</code> setting and the per-webhook
+        <code>max_concurrent</code> setting.
+      </li>
+    </ul>
+
+    <h2>Next Steps</h2>
+
+    <ul>
+      <li>
+        <a href="/docs/schedules">Schedules</a>: Automate recurring tasks
+        with cron-based schedules that deploy and tear down teams automatically.
+      </li>
+      <li>
+        <a href="/docs/configuration">Configuration</a>: Review all
+        environment variables including webhook-specific settings.
+      </li>
+      <li>
+        <a href="/docs/architecture">Architecture</a>: Understand how
+        webhooks fit into the overall system design.
+      </li>
+    </ul>
+  </div>
+</DocsLayout>

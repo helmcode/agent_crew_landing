@@ -39,6 +39,8 @@ export const landing: Record<string, Record<string, string>> = {
     'features.f4Desc': 'Define a leader agent that coordinates tasks and specialized workers that execute them. Like a real team, each agent has a clear role and expertise.',
     'features.f5Title': 'Scheduled Tasks',
     'features.f5Desc': 'Automate recurring work with cron-based schedules. Define a prompt, pick a frequency, and AgentCrew deploys the team, executes the task, and records the results automatically.',
+    'features.f6Title': 'Webhook Triggers',
+    'features.f6Desc': 'Trigger agent teams from external systems via HTTP webhooks. Use fire-and-forget or wait-for-response modes with secure token authentication.',
 
     // HowItWorks
     'howItWorks.label': 'Process',
@@ -139,6 +141,8 @@ export const landing: Record<string, Record<string, string>> = {
     'features.f4Desc': 'Define un agente lider que coordina tareas y trabajadores especializados que las ejecutan. Como un equipo real, cada agente tiene un rol y experiencia claros.',
     'features.f5Title': 'Tareas Programadas',
     'features.f5Desc': 'Automatiza trabajo recurrente con programaciones basadas en cron. Define un prompt, elige la frecuencia, y AgentCrew despliega el equipo, ejecuta la tarea y registra los resultados automaticamente.',
+    'features.f6Title': 'Webhooks',
+    'features.f6Desc': 'Activa equipos de agentes desde sistemas externos mediante webhooks HTTP. Usa modo fire-and-forget o espera la respuesta con autenticacion por token seguro.',
 
     // HowItWorks
     'howItWorks.label': 'Proceso',

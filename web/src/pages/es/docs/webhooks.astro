@@ -1,0 +1,277 @@
+---
+import DocsLayout from '../../../layouts/DocsLayout.astro';
+---
+
+<DocsLayout title="Webhooks | AgentCrew" lang="es">
+  <div class="docs-prose">
+    <h1>Webhooks</h1>
+
+    <p>
+      Los webhooks te permiten activar equipos de agentes desde sistemas externos
+      mediante HTTP. Define una plantilla de prompt con variables, asegurala con un
+      token, y llama al endpoint desde pipelines CI/CD, alertas de monitoreo,
+      integraciones de terceros o cualquier sistema que pueda hacer peticiones HTTP.
+    </p>
+
+    <h2>Casos de Uso</h2>
+
+    <ul>
+      <li><strong>CI/CD:</strong> Activa un equipo de revision de codigo cuando se abre un pull request, o ejecuta una lista de verificacion de despliegue despues de un merge.</li>
+      <li><strong>Alertas:</strong> Enruta alertas de monitoreo (PagerDuty, Grafana, Datadog) a un equipo de agentes SRE para triaje automatizado.</li>
+      <li><strong>Integraciones de terceros:</strong> Conecta eventos de CRM, envios de formularios o comandos slash de Slack a equipos de agentes especializados.</li>
+      <li><strong>Disparadores externos programados:</strong> Usa programadores externos (GitHub Actions cron, AWS EventBridge) para activar flujos de trabajo de agentes con contexto dinamico.</li>
+    </ul>
+
+    <h2>Como Funcionan los Webhooks</h2>
+
+    <p>
+      Cuando se activa un webhook, AgentCrew ejecuta los siguientes pasos:
+    </p>
+
+    <ol>
+      <li><strong>Autenticar</strong> la solicitud entrante verificando el token en la URL.</li>
+      <li><strong>Renderizar</strong> la plantilla de prompt reemplazando <code>{"{{variables}}"}</code> con los valores del cuerpo de la solicitud.</li>
+      <li><strong>Enviar</strong> el prompt renderizado al lider del equipo via NATS.</li>
+      <li><strong>Responder</strong> inmediatamente (fire-and-forget) o esperar la respuesta del agente (modo esperar respuesta).</li>
+      <li><strong>Registrar</strong> la ejecucion en el historial del webhook.</li>
+    </ol>
+
+    <p>
+      A diferencia de las tareas programadas, los webhooks <strong>no</strong> despliegan
+      ni liberan equipos. El equipo destino debe estar ya en ejecucion cuando se activa
+      el webhook. Este diseno mantiene las respuestas rapidas y evita la latencia de
+      inicio de contenedores.
+    </p>
+
+    <h2>Crear un Webhook</h2>
+
+    <p>
+      Navega a la seccion <strong>Webhooks</strong> en la barra lateral y haz clic en
+      <strong>New Webhook</strong>. El constructor de webhooks te guia a traves de:
+    </p>
+
+    <ol>
+      <li>
+        <strong>Nombre:</strong> Un nombre descriptivo para el webhook (por ejemplo,
+        "Disparador de Review de PR", "Triaje de Alertas").
+      </li>
+      <li>
+        <strong>Equipo:</strong> Selecciona que equipo de agentes recibira el prompt.
+        El equipo debe existir previamente.
+      </li>
+      <li>
+        <strong>Plantilla de Prompt:</strong> La instruccion enviada al lider del equipo
+        cuando se activa el webhook. Usa marcadores <code>{"{{nombre_variable}}"}</code>
+        para valores dinamicos que se reemplazaran en el momento de la activacion.
+      </li>
+      <li>
+        <strong>Timeout:</strong> Tiempo maximo de espera para una respuesta en el modo
+        esperar respuesta. Por defecto usa la configuracion global <code>WEBHOOK_TIMEOUT</code>.
+      </li>
+      <li>
+        <strong>Max Concurrente:</strong> Numero maximo de ejecuciones simultaneas
+        para este webhook. Las activaciones adicionales se encolan.
+      </li>
+    </ol>
+
+    <p>
+      Despues de la creacion, se genera un token unico que se muestra <strong>una sola vez</strong>.
+      Copialo y guardalo de forma segura — no se puede recuperar despues.
+    </p>
+
+    <h2>Activar un Webhook</h2>
+
+    <p>
+      Envia una solicitud <code>POST</code> al endpoint de activacion con el token del webhook:
+    </p>
+
+    <pre><code class="language-text">POST /webhook/trigger/:token</code></pre>
+
+    <p>
+      El cuerpo de la solicitud debe ser JSON con un objeto <code>variables</code> que contenga
+      los pares clave-valor que correspondan a los marcadores de tu plantilla de prompt:
+    </p>
+
+    <pre><code class="language-json">{"{"}
+  "variables": {"{"}
+    "pr_title": "Add user authentication",
+    "pr_url": "https://github.com/org/repo/pull/42",
+    "author": "alice"
+  {"}"}
+{"}"}</code></pre>
+
+    <h3>Modo Fire-and-Forget (Por Defecto)</h3>
+
+    <p>
+      Por defecto, el webhook responde inmediatamente con una respuesta
+      <code>202 Accepted</code>, confirmando que el prompt fue encolado para procesamiento:
+    </p>
+
+    <pre><code class="language-bash">curl -X POST https://tu-agentcrew/webhook/trigger/whk_abc123def456 \
+  -H "Content-Type: application/json" \
+  -d '{"{"}
+    "variables": {"{"}
+      "alert_name": "High CPU Usage",
+      "service": "api-server",
+      "severity": "warning"
+    {"}"}
+  {"}"}'
+
+# Respuesta: 202 Accepted
+# {"{"}  "status": "accepted", "run_id": "..." {"}"}</code></pre>
+
+    <h3>Modo Esperar Respuesta</h3>
+
+    <p>
+      Agrega <code>?wait=true</code> a la URL de activacion para esperar la respuesta
+      del equipo de agentes. La solicitud se bloquea hasta que el agente responde o
+      se alcanza el timeout:
+    </p>
+
+    <pre><code class="language-bash">curl -X POST "https://tu-agentcrew/webhook/trigger/whk_abc123def456?wait=true" \
+  -H "Content-Type: application/json" \
+  -d '{"{"}
+    "variables": {"{"}
+      "pr_title": "Add user authentication",
+      "pr_url": "https://github.com/org/repo/pull/42"
+    {"}"}
+  {"}"}'
+
+# Respuesta: 200 OK (con respuesta del agente)
+# {"{"}  "status": "success", "response": "...", "run_id": "..." {"}"}
+
+# O: 408 Request Timeout (si se alcanza el timeout)
+# {"{"}  "status": "timeout", "run_id": "..." {"}"}</code></pre>
+
+    <h2>Seguridad del Token</h2>
+
+    <ul>
+      <li>
+        Los tokens usan el prefijo <code>whk_</code> para facil identificacion en logs
+        y configuracion.
+      </li>
+      <li>
+        Los tokens se almacenan con <strong>hash SHA-256</strong> — el token en texto
+        plano nunca se persiste en la base de datos.
+      </li>
+      <li>
+        El token en texto plano se muestra <strong>solo una vez</strong> en el momento
+        de la creacion. Si se pierde, debes regenerar un nuevo token.
+      </li>
+    </ul>
+
+    <h2>Gestionar Webhooks</h2>
+
+    <h3>Regenerar Tokens</h3>
+
+    <p>
+      Si un token es comprometido o se pierde, puedes regenerarlo desde la pagina de
+      detalle del webhook. El token anterior se invalida inmediatamente y se muestra
+      uno nuevo una sola vez.
+    </p>
+
+    <h3>Historial de Ejecuciones</h3>
+
+    <p>
+      Cada webhook mantiene un historial paginado de todas las ejecuciones. Para cada
+      ejecucion puedes ver:
+    </p>
+
+    <ul>
+      <li><strong>Estado:</strong> exitoso, error o timeout.</li>
+      <li><strong>Inicio / Fin:</strong> Marcas de tiempo en tu zona horaria local.</li>
+      <li><strong>Duracion:</strong> Cuanto tiempo tomo la ejecucion.</li>
+      <li><strong>Variables:</strong> Las variables enviadas en la solicitud de activacion.</li>
+      <li><strong>Conversacion:</strong> Expande cualquier ejecucion para ver el prompt renderizado y la respuesta del agente.</li>
+    </ul>
+
+    <h3>Activar / Desactivar</h3>
+
+    <p>
+      Cada webhook tiene un interruptor para activarlo o desactivarlo. Los webhooks
+      desactivados devuelven <code>404 Not Found</code> cuando se activan, previniendo
+      ejecuciones accidentales.
+    </p>
+
+    <h3>Editar</h3>
+
+    <p>
+      Haz clic en cualquier webhook para editar su nombre, plantilla de prompt, equipo,
+      timeout o configuracion de concurrencia maxima. Los cambios toman efecto
+      inmediatamente para las activaciones posteriores.
+    </p>
+
+    <h3>Eliminar</h3>
+
+    <p>
+      Eliminar un webhook lo borra junto con todo su historial de ejecuciones de forma
+      permanente. El token se invalida inmediatamente.
+    </p>
+
+    <h2>Configuracion</h2>
+
+    <p>
+      El comportamiento de los webhooks se puede ajustar con variables de entorno:
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Variable</th>
+          <th>Defecto</th>
+          <th>Descripcion</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>WEBHOOK_MAX_CONCURRENT</code></td>
+          <td><code>20</code></td>
+          <td>Numero maximo global de ejecuciones de webhooks que pueden ejecutarse simultaneamente. Las activaciones excedentes se encolan. Tambien se puede sobreescribir por webhook.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Notas de Arquitectura</h2>
+
+    <ul>
+      <li>
+        El motor de webhooks se ejecuta como parte del proceso del servidor API —
+        no se necesita un servicio separado.
+      </li>
+      <li>
+        Los webhooks requieren que el equipo destino este <strong>ya en ejecucion</strong>.
+        A diferencia de las tareas programadas, no despliegan ni liberan equipos.
+      </li>
+      <li>
+        <strong>Procesamiento FIFO por equipo:</strong> Cuando multiples webhooks (o
+        webhooks y mensajes de chat) apuntan al mismo equipo, los mensajes se encolan
+        y procesan uno a la vez en orden de llegada. Un ID de correlacion asegura que
+        cada llamador reciba la respuesta correcta, usando el mismo mecanismo de
+        correlacion FIFO de NATS que las tareas programadas.
+      </li>
+      <li>
+        La concurrencia se controla en dos niveles: la configuracion global
+        <code>WEBHOOK_MAX_CONCURRENT</code> y la configuracion por webhook
+        <code>max_concurrent</code>.
+      </li>
+    </ul>
+
+    <h2>Siguientes Pasos</h2>
+
+    <ul>
+      <li>
+        <a href="/es/docs/schedules">Tareas Programadas</a>: Automatiza tareas
+        recurrentes con programaciones basadas en cron que despliegan y liberan
+        equipos automaticamente.
+      </li>
+      <li>
+        <a href="/es/docs/configuration">Configuracion</a>: Revisa todas las
+        variables de entorno incluyendo las configuraciones especificas de webhooks.
+      </li>
+      <li>
+        <a href="/es/docs/architecture">Arquitectura</a>: Comprende como los
+        webhooks encajan en el diseno general del sistema.
+      </li>
+    </ul>
+  </div>
+</DocsLayout>
