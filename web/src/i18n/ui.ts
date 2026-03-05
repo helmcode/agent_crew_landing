@@ -57,6 +57,7 @@ export const ui: Record<Lang, Record<string, string>> = {
     'docs.skills': 'Skills',
     'docs.schedules': 'Schedules',
     'docs.webhooks': 'Webhooks',
+    'docs.mcp': 'MCP Servers',
     'docs.architecture': 'Architecture',
   },
   es: {
@@ -108,6 +109,7 @@ export const ui: Record<Lang, Record<string, string>> = {
     'docs.skills': 'Habilidades',
     'docs.schedules': 'Tareas Programadas',
     'docs.webhooks': 'Webhooks',
+    'docs.mcp': 'Servidores MCP',
     'docs.architecture': 'Arquitectura',
   },
 };

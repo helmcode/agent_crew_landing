@@ -1,0 +1,222 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+---
+
+<DocsLayout title="MCP Servers | AgentCrew" lang="en">
+  <div class="docs-prose">
+    <h1>MCP Servers</h1>
+
+    <p>
+      MCP (Model Context Protocol) servers give your agents access to external
+      tools and data sources: databases, APIs, Kubernetes clusters, file
+      systems, and more. Configure MCP servers at the team level and every
+      agent in the team can use them.
+    </p>
+
+    <h2>How MCP Works in AgentCrew</h2>
+
+    <p>
+      MCP is an open standard for connecting AI models to external tools.
+      AgentCrew supports three transport types:
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Transport</th>
+          <th>Description</th>
+          <th>Example</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>stdio</strong></td>
+          <td>Local process communicating via stdin/stdout. The command runs inside the agent container.</td>
+          <td><code>npx -y @modelcontextprotocol/server-postgres</code></td>
+        </tr>
+        <tr>
+          <td><strong>http</strong></td>
+          <td>Remote HTTP server implementing the MCP protocol.</td>
+          <td><code>https://mcp.sentry.dev/sse</code></td>
+        </tr>
+        <tr>
+          <td><strong>sse</strong></td>
+          <td>Remote server using Server-Sent Events for streaming responses.</td>
+          <td><code>https://api.example.com/mcp/sse</code></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+      MCP configuration is <strong>global per team</strong>, not per agent.
+      When you add an MCP server, it becomes available to the leader and all
+      workers in the team.
+    </p>
+
+    <h2>Adding MCP Servers During Team Creation</h2>
+
+    <p>
+      In the team creation wizard (<strong>Step 2</strong>), scroll to the
+      <strong>MCP Servers</strong> section at the bottom. For each server,
+      provide:
+    </p>
+
+    <ul>
+      <li><strong>Name</strong>: A unique identifier (e.g., <code>postgres-db</code>, <code>kubernetes</code>)</li>
+      <li><strong>Transport</strong>: <code>stdio</code>, <code>http</code>, or <code>sse</code></li>
+    </ul>
+
+    <p>Then, depending on the transport:</p>
+
+    <h3>stdio servers</h3>
+    <ul>
+      <li><strong>Command</strong>: The binary to run (e.g., <code>npx</code>, <code>uvx</code>)</li>
+      <li><strong>Args</strong>: Command arguments, comma-separated (e.g., <code>-y, @modelcontextprotocol/server-postgres</code>)</li>
+      <li><strong>Environment Variables</strong>: Key-value pairs passed to the process (e.g., <code>DATABASE_URL=postgresql://...</code>)</li>
+    </ul>
+
+    <h3>http / sse servers</h3>
+    <ul>
+      <li><strong>URL</strong>: The server endpoint (e.g., <code>https://mcp.sentry.dev/sse</code>)</li>
+      <li><strong>Headers</strong>: Authentication or custom headers (e.g., <code>Authorization: Bearer token</code>)</li>
+    </ul>
+
+    <h2>Adding MCP Servers to Running Teams</h2>
+
+    <p>
+      You can add, edit, or remove MCP servers on teams that are already running:
+    </p>
+
+    <ol>
+      <li>Open the team's chat view.</li>
+      <li>Click the <strong>Settings</strong> icon to open the team settings modal.</li>
+      <li>Select the <strong>MCP Servers</strong> tab in the sidebar.</li>
+      <li>Use the form to add a new server or click <strong>Edit</strong> / <strong>Remove</strong> on existing ones.</li>
+    </ol>
+
+    <blockquote>
+      <strong>Important:</strong> After adding or removing MCP servers, the
+      agent process must be restarted to pick up the changes. The UI shows an
+      amber warning banner with a <strong>Redeploy Team</strong> button when
+      a redeploy is needed.
+    </blockquote>
+
+    <h2>MCP Status Monitoring</h2>
+
+    <p>
+      Each MCP server shows its status in the Settings modal:
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Status</th>
+          <th>Indicator</th>
+          <th>Meaning</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Configured</strong></td>
+          <td>Green dot</td>
+          <td>The server configuration was written successfully and passed health checks.</td>
+        </tr>
+        <tr>
+          <td><strong>Error</strong></td>
+          <td>Red dot</td>
+          <td>The server failed health checks. Click the arrow to expand error details.</td>
+        </tr>
+        <tr>
+          <td><strong>Pending</strong></td>
+          <td>Gray dot</td>
+          <td>The server is waiting for status from the agent container.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+      When an MCP server has an error, the error details are expandable
+      directly in the server list. Common causes include:
+    </p>
+
+    <ul>
+      <li>Package not found (wrong npm/pip package name)</li>
+      <li>Remote server unreachable (wrong URL or network issue)</li>
+      <li>Command not found (binary not installed in the agent image)</li>
+      <li>Timeout during dependency download</li>
+    </ul>
+
+    <h2>Provider Configuration</h2>
+
+    <p>
+      AgentCrew automatically generates the correct configuration file based
+      on the team's AI provider:
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Provider</th>
+          <th>Config file</th>
+          <th>Location</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Claude Code</td>
+          <td><code>.mcp.json</code></td>
+          <td><code>/workspace/.mcp.json</code></td>
+        </tr>
+        <tr>
+          <td>OpenCode</td>
+          <td><code>opencode.json</code></td>
+          <td><code>/workspace/opencode.json</code></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+      You do not need to write these files manually. The sidecar process
+      generates them automatically from your MCP server configuration.
+    </p>
+
+    <h2>Examples</h2>
+
+    <h3>PostgreSQL Database</h3>
+    <pre><code class="language-text">Name:      postgres-db
+Transport: stdio
+Command:   npx
+Args:      -y, @modelcontextprotocol/server-postgres
+Env:       DATABASE_URL = postgresql://user:pass@host:5432/mydb</code></pre>
+
+    <h3>Kubernetes Cluster</h3>
+    <pre><code class="language-text">Name:      kubernetes
+Transport: stdio
+Command:   npx
+Args:      mcp-server-kubernetes
+Env:       KUBECONFIG_PATH = /path/to/kubeconfig</code></pre>
+
+    <h3>Sentry Error Tracking</h3>
+    <pre><code class="language-text">Name:      sentry
+Transport: http
+URL:       https://mcp.sentry.dev/sse
+Headers:   Authorization = Bearer &lt;your-token&gt;</code></pre>
+
+    <h2>Next Steps</h2>
+
+    <ul>
+      <li>
+        <a href="/docs/skills">Skills</a>: Extend agent capabilities with
+        installable skill packages.
+      </li>
+      <li>
+        <a href="/docs/providers">Providers</a>: Learn about supported AI
+        providers and how MCP works with each.
+      </li>
+      <li>
+        <a href="/docs/architecture">Architecture</a>: Understand how the
+        sidecar generates MCP configuration files.
+      </li>
+    </ul>
+  </div>
+</DocsLayout>
