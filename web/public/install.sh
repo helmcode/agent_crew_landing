@@ -76,10 +76,12 @@ install() {
   # Create install directory
   if [[ -d "$INSTALL_DIR" ]]; then
     warn "Directory '$INSTALL_DIR' already exists."
-    overwrite=$(bash -c 'read -rp "Overwrite configuration? [y/N]: " ans </dev/tty && echo "$ans"' 2>/dev/null) || {
+    if bash -c 'true </dev/tty' 2>/dev/null; then
+      overwrite=$(bash -c 'read -rp "Overwrite configuration? [y/N]: " ans </dev/tty 2>/dev/tty && echo "$ans"')
+    else
       overwrite="y"
       info "No TTY available, proceeding with overwrite."
-    }
+    fi
     if [[ "$overwrite" != "y" && "$overwrite" != "Y" ]]; then
       fail "Installation cancelled."
     fi
