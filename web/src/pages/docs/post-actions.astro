@@ -1,0 +1,214 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+---
+
+<DocsLayout title="Post-Actions | AgentCrew" lang="en">
+  <div class="docs-prose">
+    <h1>Post-Actions</h1>
+
+    <p>
+      Post-actions are reusable HTTP callbacks that fire automatically after a
+      webhook or schedule run completes. They let you notify external systems
+      (Slack, PagerDuty, custom APIs) about execution results without writing
+      any integration code.
+    </p>
+
+    <h2>Use Cases</h2>
+
+    <ul>
+      <li><strong>Slack notifications:</strong> Send a message to a channel when a scheduled task finishes or fails.</li>
+      <li><strong>Incident management:</strong> Create a PagerDuty or Opsgenie incident when an agent run fails.</li>
+      <li><strong>Webhooks to external systems:</strong> Forward execution results to your own API for logging, metrics, or further processing.</li>
+      <li><strong>Status dashboards:</strong> Push run results to a status page or monitoring tool.</li>
+    </ul>
+
+    <h2>How Post-Actions Work</h2>
+
+    <ol>
+      <li><strong>Create a post-action:</strong> Define a reusable HTTP request template (method, URL, headers, body, auth).</li>
+      <li><strong>Bind it:</strong> Attach the post-action to one or more webhooks or schedules via bindings. Each binding specifies when to fire: on success, failure, or any outcome.</li>
+      <li><strong>Automatic execution:</strong> When a webhook or schedule run completes, all matching bindings are evaluated and their post-actions are fired in parallel.</li>
+      <li><strong>Fire-and-forget:</strong> Post-actions never block the webhook or schedule. They run asynchronously in the background.</li>
+    </ol>
+
+    <h2>Key Concepts</h2>
+
+    <h3>Post-Action</h3>
+    <p>
+      A post-action is a reusable HTTP request definition. It includes:
+    </p>
+    <ul>
+      <li><strong>Method:</strong> GET, POST, PUT, PATCH, or DELETE.</li>
+      <li><strong>URL:</strong> The endpoint to call. Supports template variables.</li>
+      <li><strong>Headers:</strong> Custom HTTP headers (e.g., <code>Content-Type: application/json</code>).</li>
+      <li><strong>Body template:</strong> The request body with template variables that are replaced at execution time.</li>
+      <li><strong>Authentication:</strong> Optional auth (Bearer token, Basic auth, or custom header).</li>
+      <li><strong>Timeout:</strong> Per-request timeout (1-300 seconds, default 30).</li>
+      <li><strong>Retry count:</strong> Number of retry attempts on failure (0-5, default 0).</li>
+    </ul>
+
+    <h3>Binding</h3>
+    <p>
+      A binding connects a post-action to a specific webhook or schedule. It specifies:
+    </p>
+    <ul>
+      <li><strong>Trigger type:</strong> <code>webhook</code> or <code>schedule</code>.</li>
+      <li><strong>Trigger:</strong> Which specific webhook or schedule to watch.</li>
+      <li><strong>Fire when:</strong> <code>any</code> (always fire), <code>success</code> (only on success), or <code>failure</code> (only on failure/timeout).</li>
+      <li><strong>Body override:</strong> Optionally override the post-action's default body template for this specific binding.</li>
+      <li><strong>Enabled:</strong> Toggle the binding on or off without deleting it.</li>
+    </ul>
+    <p>
+      A single post-action can have multiple bindings, allowing you to reuse the
+      same notification template across different webhooks and schedules.
+    </p>
+
+    <h3>Run History</h3>
+    <p>
+      Every post-action execution is recorded. For each run you can see:
+    </p>
+    <ul>
+      <li><strong>Status:</strong> success or failed.</li>
+      <li><strong>HTTP status code:</strong> The response code from the target server.</li>
+      <li><strong>Request sent:</strong> The method and URL that was called.</li>
+      <li><strong>Response body:</strong> The first 4KB of the response.</li>
+      <li><strong>Error:</strong> Error details if the request failed.</li>
+      <li><strong>Duration:</strong> How long the request took.</li>
+    </ul>
+
+    <h2>Template Variables</h2>
+
+    <p>
+      Use double-brace placeholders in the URL, body template, or header values.
+      These are replaced with actual values at execution time:
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Variable</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><code>{"{{status}}"}</code></td><td>Run result: <code>success</code> or <code>failed</code></td></tr>
+        <tr><td><code>{"{{trigger_type}}"}</code></td><td>Source type: <code>webhook</code> or <code>schedule</code></td></tr>
+        <tr><td><code>{"{{trigger_name}}"}</code></td><td>Name of the webhook or schedule that triggered the run</td></tr>
+        <tr><td><code>{"{{team_name}}"}</code></td><td>Name of the agent team</td></tr>
+        <tr><td><code>{"{{run_id}}"}</code></td><td>Unique identifier of the source run</td></tr>
+        <tr><td><code>{"{{response}}"}</code></td><td>The agent's response text (JSON-escaped in JSON templates)</td></tr>
+        <tr><td><code>{"{{error}}"}</code></td><td>Error message if the run failed (empty on success)</td></tr>
+        <tr><td><code>{"{{prompt}}"}</code></td><td>The prompt that was sent to the agent</td></tr>
+        <tr><td><code>{"{{started_at}}"}</code></td><td>Run start timestamp</td></tr>
+        <tr><td><code>{"{{finished_at}}"}</code></td><td>Run end timestamp</td></tr>
+      </tbody>
+    </table>
+
+    <p>
+      When the template looks like JSON (starts with <code>{"{"}</code> or <code>[</code>),
+      variable values are automatically JSON-escaped to prevent broken payloads.
+    </p>
+
+    <h2>Example: Slack Notification</h2>
+
+    <p>
+      To send a Slack message when a schedule completes:
+    </p>
+
+    <ol>
+      <li>
+        Create a post-action with:
+        <ul>
+          <li><strong>Method:</strong> POST</li>
+          <li><strong>URL:</strong> Your Slack incoming webhook URL</li>
+          <li><strong>Header:</strong> <code>Content-Type: application/json</code></li>
+          <li>
+            <strong>Body template:</strong>
+            <pre><code class="language-json">{`{
+  "text": "{{trigger_type}} '{{trigger_name}}' finished: {{status}}\\nTeam: {{team_name}}\\nRun: {{run_id}}\\nError: {{error}}"
+}`}</code></pre>
+          </li>
+        </ul>
+      </li>
+      <li>Create a binding to your schedule with <strong>Fire when: any</strong>.</li>
+      <li>The next time the schedule runs, you will get a Slack message with the result.</li>
+    </ol>
+
+    <h2>Authentication</h2>
+
+    <p>
+      Post-actions support four authentication modes:
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Mode</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>None</strong></td><td>No authentication. Suitable for services that use URL-based auth (e.g., Slack webhooks).</td></tr>
+        <tr><td><strong>Bearer</strong></td><td>Adds an <code>Authorization: Bearer &lt;token&gt;</code> header.</td></tr>
+        <tr><td><strong>Basic</strong></td><td>Adds HTTP Basic Authentication with username and password.</td></tr>
+        <tr><td><strong>Custom Header</strong></td><td>Adds a custom header with a name and value you specify (e.g., <code>X-API-Key</code>).</td></tr>
+      </tbody>
+    </table>
+
+    <p>
+      Authentication credentials are encrypted at rest using AES-256-GCM.
+    </p>
+
+    <h2>Retry Behavior</h2>
+
+    <p>
+      When a post-action fails (network error or HTTP 5xx response), it retries
+      with exponential backoff:
+    </p>
+
+    <ul>
+      <li>1st retry after 1 second</li>
+      <li>2nd retry after 2 seconds</li>
+      <li>3rd retry after 4 seconds</li>
+      <li>Up to a maximum of 5 retries, capped at 30 seconds between attempts</li>
+    </ul>
+
+    <p>
+      HTTP 4xx responses are <strong>not</strong> retried (they indicate a client
+      error that won't resolve with retrying).
+    </p>
+
+    <h2>Managing Post-Actions</h2>
+
+    <h3>From the Post-Actions Page</h3>
+    <p>
+      Navigate to <strong>Post-Actions</strong> in the sidebar to see all defined
+      post-actions. From here you can create, edit, enable/disable, or delete
+      post-actions and view their run history.
+    </p>
+
+    <h3>From Webhook/Schedule Detail Pages</h3>
+    <p>
+      Each webhook and schedule detail page has a <strong>Post-Action Bindings</strong>
+      section where you can add, edit, or remove bindings directly. This lets you
+      manage which post-actions fire for a specific trigger without leaving the page.
+    </p>
+
+    <h2>Architecture Notes</h2>
+
+    <ul>
+      <li>Post-actions are <strong>fire-and-forget</strong>: they never block or delay the webhook/schedule response.</li>
+      <li>Multiple bindings for the same trigger execute in <strong>parallel</strong>.</li>
+      <li>Post-actions are <strong>not tied to teams</strong>: they are a platform-level feature.</li>
+      <li>There are no SSRF restrictions: post-actions can reach private IPs and internal services. This is by design, as AgentCrew is typically deployed behind a VPN or in a private network.</li>
+    </ul>
+
+    <h2>Next Steps</h2>
+
+    <ul>
+      <li><a href="/docs/webhooks">Webhooks</a>: Learn about webhook triggers that can fire post-actions.</li>
+      <li><a href="/docs/schedules">Schedules</a>: Learn about scheduled tasks that can fire post-actions.</li>
+      <li><a href="/docs/configuration">Configuration</a>: Review all environment variables.</li>
+    </ul>
+  </div>
+</DocsLayout>

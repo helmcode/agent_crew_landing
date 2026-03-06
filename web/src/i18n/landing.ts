@@ -39,6 +39,8 @@ export const landing: Record<string, Record<string, string>> = {
     'features.f4Desc': 'Trigger agent teams from external systems via HTTP webhooks. Use fire-and-forget or wait-for-response modes with secure token authentication.',
     'features.f5Title': 'MCP Servers',
     'features.f5Desc': 'Connect agents to external tools via the Model Context Protocol. Databases, APIs, Kubernetes clusters, and more. Configure once, shared across the entire team.',
+    'features.f6Title': 'Post-Actions',
+    'features.f6Desc': 'Reusable HTTP callbacks that fire automatically after webhook or schedule runs. Notify Slack, PagerDuty, or any API about execution results with template variables and retry logic.',
 
     // HowItWorks
     'howItWorks.label': 'Process',
@@ -139,6 +141,8 @@ export const landing: Record<string, Record<string, string>> = {
     'features.f4Desc': 'Activa equipos de agentes desde sistemas externos mediante webhooks HTTP. Usa modo fire-and-forget o espera la respuesta con autenticacion por token seguro.',
     'features.f5Title': 'Servidores MCP',
     'features.f5Desc': 'Conecta agentes a herramientas externas via Model Context Protocol. Bases de datos, APIs, clusters de Kubernetes y mas. Configura una vez, compartido con todo el equipo.',
+    'features.f6Title': 'Post-Actions',
+    'features.f6Desc': 'Callbacks HTTP reutilizables que se ejecutan automaticamente tras ejecuciones de webhooks o tareas programadas. Notifica a Slack, PagerDuty o cualquier API con variables de plantilla y logica de reintentos.',
 
     // HowItWorks
     'howItWorks.label': 'Proceso',

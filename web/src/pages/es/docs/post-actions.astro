@@ -1,0 +1,215 @@
+---
+import DocsLayout from '../../../layouts/DocsLayout.astro';
+---
+
+<DocsLayout title="Post-Actions | AgentCrew" lang="es">
+  <div class="docs-prose">
+    <h1>Post-Actions</h1>
+
+    <p>
+      Las post-actions son callbacks HTTP reutilizables que se ejecutan
+      automaticamente al completarse una ejecucion de webhook o tarea programada.
+      Permiten notificar a sistemas externos (Slack, PagerDuty, APIs propias)
+      sobre los resultados sin escribir codigo de integracion.
+    </p>
+
+    <h2>Casos de Uso</h2>
+
+    <ul>
+      <li><strong>Notificaciones a Slack:</strong> Enviar un mensaje a un canal cuando una tarea programada termina o falla.</li>
+      <li><strong>Gestion de incidentes:</strong> Crear un incidente en PagerDuty u Opsgenie cuando falla la ejecucion de un agente.</li>
+      <li><strong>Webhooks a sistemas externos:</strong> Reenviar resultados de ejecucion a tu propia API para logging, metricas o procesamiento adicional.</li>
+      <li><strong>Dashboards de estado:</strong> Enviar resultados a una pagina de estado o herramienta de monitoreo.</li>
+    </ul>
+
+    <h2>Como Funcionan</h2>
+
+    <ol>
+      <li><strong>Crear una post-action:</strong> Define una plantilla de peticion HTTP reutilizable (metodo, URL, cabeceras, cuerpo, autenticacion).</li>
+      <li><strong>Vincularla:</strong> Conecta la post-action a uno o mas webhooks o tareas programadas mediante bindings. Cada binding especifica cuando dispararse: en exito, fallo, o cualquier resultado.</li>
+      <li><strong>Ejecucion automatica:</strong> Cuando un webhook o tarea programada termina, todos los bindings coincidentes se evaluan y sus post-actions se ejecutan en paralelo.</li>
+      <li><strong>Fire-and-forget:</strong> Las post-actions nunca bloquean al webhook o tarea programada. Se ejecutan de forma asincrona en segundo plano.</li>
+    </ol>
+
+    <h2>Conceptos Clave</h2>
+
+    <h3>Post-Action</h3>
+    <p>
+      Una post-action es una definicion de peticion HTTP reutilizable que incluye:
+    </p>
+    <ul>
+      <li><strong>Metodo:</strong> GET, POST, PUT, PATCH o DELETE.</li>
+      <li><strong>URL:</strong> El endpoint a llamar. Soporta variables de plantilla.</li>
+      <li><strong>Cabeceras:</strong> Cabeceras HTTP personalizadas (ej. <code>Content-Type: application/json</code>).</li>
+      <li><strong>Plantilla de cuerpo:</strong> El cuerpo de la peticion con variables que se reemplazan en tiempo de ejecucion.</li>
+      <li><strong>Autenticacion:</strong> Auth opcional (Bearer token, Basic auth o cabecera personalizada).</li>
+      <li><strong>Timeout:</strong> Tiempo maximo por peticion (1-300 segundos, por defecto 30).</li>
+      <li><strong>Reintentos:</strong> Numero de reintentos en caso de fallo (0-5, por defecto 0).</li>
+    </ul>
+
+    <h3>Binding</h3>
+    <p>
+      Un binding conecta una post-action con un webhook o tarea programada especifica. Especifica:
+    </p>
+    <ul>
+      <li><strong>Tipo de trigger:</strong> <code>webhook</code> o <code>schedule</code>.</li>
+      <li><strong>Trigger:</strong> Que webhook o tarea programada especifica monitorear.</li>
+      <li><strong>Disparar cuando:</strong> <code>any</code> (siempre), <code>success</code> (solo en exito) o <code>failure</code> (solo en fallo/timeout).</li>
+      <li><strong>Override de cuerpo:</strong> Opcionalmente sobreescribir la plantilla de cuerpo por defecto para este binding especifico.</li>
+      <li><strong>Habilitado:</strong> Activar o desactivar el binding sin eliminarlo.</li>
+    </ul>
+    <p>
+      Una misma post-action puede tener multiples bindings, permitiendo reutilizar
+      la misma plantilla de notificacion en diferentes webhooks y tareas programadas.
+    </p>
+
+    <h3>Historial de Ejecuciones</h3>
+    <p>
+      Cada ejecucion de post-action queda registrada. Para cada ejecucion puedes ver:
+    </p>
+    <ul>
+      <li><strong>Estado:</strong> success o failed.</li>
+      <li><strong>Codigo HTTP:</strong> El codigo de respuesta del servidor destino.</li>
+      <li><strong>Peticion enviada:</strong> El metodo y URL que se llamo.</li>
+      <li><strong>Cuerpo de respuesta:</strong> Los primeros 4KB de la respuesta.</li>
+      <li><strong>Error:</strong> Detalles del error si la peticion fallo.</li>
+      <li><strong>Duracion:</strong> Cuanto tardo la peticion.</li>
+    </ul>
+
+    <h2>Variables de Plantilla</h2>
+
+    <p>
+      Usa placeholders con doble llave en la URL, plantilla de cuerpo o valores de cabecera.
+      Se reemplazan con valores reales en tiempo de ejecucion:
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Variable</th>
+          <th>Descripcion</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><code>{"{{status}}"}</code></td><td>Resultado: <code>success</code> o <code>failed</code></td></tr>
+        <tr><td><code>{"{{trigger_type}}"}</code></td><td>Tipo de origen: <code>webhook</code> o <code>schedule</code></td></tr>
+        <tr><td><code>{"{{trigger_name}}"}</code></td><td>Nombre del webhook o tarea programada que genero la ejecucion</td></tr>
+        <tr><td><code>{"{{team_name}}"}</code></td><td>Nombre del equipo de agentes</td></tr>
+        <tr><td><code>{"{{run_id}}"}</code></td><td>Identificador unico de la ejecucion origen</td></tr>
+        <tr><td><code>{"{{response}}"}</code></td><td>Respuesta del agente (escapada en JSON dentro de plantillas JSON)</td></tr>
+        <tr><td><code>{"{{error}}"}</code></td><td>Mensaje de error si la ejecucion fallo (vacio en caso de exito)</td></tr>
+        <tr><td><code>{"{{prompt}}"}</code></td><td>El prompt que se envio al agente</td></tr>
+        <tr><td><code>{"{{started_at}}"}</code></td><td>Timestamp de inicio de la ejecucion</td></tr>
+        <tr><td><code>{"{{finished_at}}"}</code></td><td>Timestamp de fin de la ejecucion</td></tr>
+      </tbody>
+    </table>
+
+    <p>
+      Cuando la plantilla parece JSON (comienza con <code>{"{"}</code> o <code>[</code>),
+      los valores de las variables se escapan automaticamente para evitar payloads rotos.
+    </p>
+
+    <h2>Ejemplo: Notificacion a Slack</h2>
+
+    <p>
+      Para enviar un mensaje a Slack cuando una tarea programada completa:
+    </p>
+
+    <ol>
+      <li>
+        Crea una post-action con:
+        <ul>
+          <li><strong>Metodo:</strong> POST</li>
+          <li><strong>URL:</strong> Tu URL de incoming webhook de Slack</li>
+          <li><strong>Cabecera:</strong> <code>Content-Type: application/json</code></li>
+          <li>
+            <strong>Plantilla de cuerpo:</strong>
+            <pre><code class="language-json">{`{
+  "text": "{{trigger_type}} '{{trigger_name}}' finalizo: {{status}}\\nEquipo: {{team_name}}\\nRun: {{run_id}}\\nError: {{error}}"
+}`}</code></pre>
+          </li>
+        </ul>
+      </li>
+      <li>Crea un binding a tu tarea programada con <strong>Disparar cuando: any</strong>.</li>
+      <li>La proxima vez que la tarea se ejecute, recibiras un mensaje en Slack con el resultado.</li>
+    </ol>
+
+    <h2>Autenticacion</h2>
+
+    <p>
+      Las post-actions soportan cuatro modos de autenticacion:
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Modo</th>
+          <th>Descripcion</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Ninguno</strong></td><td>Sin autenticacion. Adecuado para servicios que usan auth basada en URL (ej. webhooks de Slack).</td></tr>
+        <tr><td><strong>Bearer</strong></td><td>Agrega una cabecera <code>Authorization: Bearer &lt;token&gt;</code>.</td></tr>
+        <tr><td><strong>Basic</strong></td><td>Agrega autenticacion HTTP Basic con usuario y contrasena.</td></tr>
+        <tr><td><strong>Cabecera personalizada</strong></td><td>Agrega una cabecera personalizada con nombre y valor (ej. <code>X-API-Key</code>).</td></tr>
+      </tbody>
+    </table>
+
+    <p>
+      Las credenciales de autenticacion se cifran en reposo usando AES-256-GCM.
+    </p>
+
+    <h2>Comportamiento de Reintentos</h2>
+
+    <p>
+      Cuando una post-action falla (error de red o respuesta HTTP 5xx), se reintenta
+      con backoff exponencial:
+    </p>
+
+    <ul>
+      <li>1er reintento tras 1 segundo</li>
+      <li>2do reintento tras 2 segundos</li>
+      <li>3er reintento tras 4 segundos</li>
+      <li>Hasta un maximo de 5 reintentos, con tope de 30 segundos entre intentos</li>
+    </ul>
+
+    <p>
+      Las respuestas HTTP 4xx <strong>no</strong> se reintentan (indican un error
+      del cliente que no se resolvera reintentando).
+    </p>
+
+    <h2>Gestion de Post-Actions</h2>
+
+    <h3>Desde la Pagina de Post-Actions</h3>
+    <p>
+      Navega a <strong>Post-Actions</strong> en la barra lateral para ver todas las
+      post-actions definidas. Desde ahi puedes crear, editar, habilitar/deshabilitar
+      o eliminar post-actions y ver su historial de ejecuciones.
+    </p>
+
+    <h3>Desde las Paginas de Detalle de Webhook/Tarea Programada</h3>
+    <p>
+      Cada pagina de detalle de webhook y tarea programada tiene una seccion de
+      <strong>Post-Action Bindings</strong> donde puedes agregar, editar o eliminar
+      bindings directamente. Esto te permite gestionar que post-actions se disparan
+      para un trigger especifico sin salir de la pagina.
+    </p>
+
+    <h2>Notas de Arquitectura</h2>
+
+    <ul>
+      <li>Las post-actions son <strong>fire-and-forget</strong>: nunca bloquean ni retrasan la respuesta del webhook/tarea programada.</li>
+      <li>Multiples bindings para el mismo trigger se ejecutan en <strong>paralelo</strong>.</li>
+      <li>Las post-actions <strong>no estan vinculadas a equipos</strong>: son una funcionalidad a nivel de plataforma.</li>
+      <li>No hay restricciones SSRF: las post-actions pueden alcanzar IPs privadas y servicios internos. Esto es por diseno, ya que AgentCrew se despliega tipicamente detras de una VPN o en una red privada.</li>
+    </ul>
+
+    <h2>Siguientes Pasos</h2>
+
+    <ul>
+      <li><a href="/es/docs/webhooks">Webhooks</a>: Aprende sobre los triggers de webhook que pueden disparar post-actions.</li>
+      <li><a href="/es/docs/schedules">Tareas Programadas</a>: Aprende sobre las tareas programadas que pueden disparar post-actions.</li>
+      <li><a href="/es/docs/configuration">Configuracion</a>: Revisa todas las variables de entorno.</li>
+    </ul>
+  </div>
+</DocsLayout>
