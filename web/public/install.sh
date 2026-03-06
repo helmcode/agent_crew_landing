@@ -76,8 +76,8 @@ install() {
   # Create install directory
   if [[ -d "$INSTALL_DIR" ]]; then
     warn "Directory '$INSTALL_DIR' already exists."
-    if [[ -t 0 ]] || { [[ -e /dev/tty ]] && echo -n '' > /dev/tty 2>/dev/null; }; then
-      read -rp "Overwrite configuration? [y/N]: " overwrite </dev/tty
+    if read -rp "Overwrite configuration? [y/N]: " overwrite </dev/tty 2>/dev/null; then
+      :
     else
       overwrite="y"
       info "No TTY available, proceeding with overwrite."
