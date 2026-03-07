@@ -1,7 +1,7 @@
 export const landing: Record<string, Record<string, string>> = {
   en: {
     // Hero
-    'hero.badge': 'The Kubernetes of AI Agents',
+    'hero.badge': 'The N8N of AI Agents',
     'hero.heading1': 'Orchestrate',
     'hero.headingGradient': 'AI Agent Teams',
     'hero.subtitle': 'Build, deploy, and manage collaborative AI agent teams for any purpose. Engineering, marketing, finance, operations. Define the mission, and AgentCrew handles the orchestration.',
@@ -16,7 +16,7 @@ export const landing: Record<string, Record<string, string>> = {
     'whatIs.label': 'About',
     'whatIs.heading': 'What is',
     'whatIs.headingGradient': 'AgentCrew',
-    'whatIs.subtitle': 'AgentCrew is an open-source AI agent orchestrator. Just as Kubernetes orchestrates containers regardless of the application inside, AgentCrew orchestrates AI agents regardless of their purpose. Define your team, describe their roles in plain text, deploy, and let them collaborate autonomously.',
+    'whatIs.subtitle': 'AgentCrew is an open-source AI agent orchestrator. Just as N8N automates workflows regardless of the services involved, AgentCrew orchestrates AI agents regardless of their purpose. Define your team, describe their roles in plain text, deploy, and let them collaborate autonomously.',
     'whatIs.card1Title': 'Purpose-Agnostic',
     'whatIs.card1Desc': 'Build teams for software engineering, marketing, finance, research, operations, or any domain. Agent specialization is driven by documentation, not code.',
     'whatIs.card2Title': 'Documentation-Driven',
@@ -128,7 +128,7 @@ export const landing: Record<string, Record<string, string>> = {
   },
   es: {
     // Hero
-    'hero.badge': 'El Kubernetes de los Agentes IA',
+    'hero.badge': 'El N8N de los Agentes IA',
     'hero.heading1': 'Orquesta',
     'hero.headingGradient': 'Equipos de Agentes IA',
     'hero.subtitle': 'Construye, despliega y gestiona equipos colaborativos de agentes IA para cualquier proposito. Ingenieria, marketing, finanzas, operaciones. Define la mision y AgentCrew se encarga de la orquestacion.',
@@ -143,7 +143,7 @@ export const landing: Record<string, Record<string, string>> = {
     'whatIs.label': 'Acerca de',
     'whatIs.heading': 'Que es',
     'whatIs.headingGradient': 'AgentCrew',
-    'whatIs.subtitle': 'AgentCrew es un orquestador de agentes IA de codigo abierto. Asi como Kubernetes orquesta contenedores sin importar la aplicacion dentro, AgentCrew orquesta agentes IA sin importar su proposito. Define tu equipo, describe sus roles en texto plano, despliega y dejalos colaborar de forma autonoma.',
+    'whatIs.subtitle': 'AgentCrew es un orquestador de agentes IA de codigo abierto. Asi como N8N automatiza flujos de trabajo sin importar los servicios involucrados, AgentCrew orquesta agentes IA sin importar su proposito. Define tu equipo, describe sus roles en texto plano, despliega y dejalos colaborar de forma autonoma.',
     'whatIs.card1Title': 'Proposito General',
     'whatIs.card1Desc': 'Crea equipos para ingenieria de software, marketing, finanzas, investigacion, operaciones o cualquier dominio. La especializacion del agente viene de la documentacion, no del codigo.',
     'whatIs.card2Title': 'Dirigido por Documentacion',

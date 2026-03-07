@@ -19,7 +19,7 @@ export const ui: Record<Lang, Record<string, string>> = {
     'nav.getStarted': 'Get Started',
 
     // Footer
-    'footer.tagline': 'The Kubernetes of AI Agents. Orchestrate agent teams for any purpose, defined by documentation.',
+    'footer.tagline': 'The N8N of AI Agents. Orchestrate agent teams for any purpose, defined by documentation.',
     'footer.github': 'GitHub',
     'footer.docs': 'Documentation',
     'footer.roadmap': 'Roadmap',
@@ -60,6 +60,7 @@ export const ui: Record<Lang, Record<string, string>> = {
     'docs.webhooks': 'Webhooks',
     'docs.postActions': 'Post-Actions',
     'docs.mcp': 'MCP Servers',
+    'docs.authentication': 'Authentication',
     'docs.architecture': 'Architecture',
   },
   es: {
@@ -73,7 +74,7 @@ export const ui: Record<Lang, Record<string, string>> = {
     'nav.getStarted': 'Comenzar',
 
     // Footer
-    'footer.tagline': 'El Kubernetes de los Agentes IA. Orquesta equipos de agentes para cualquier proposito, definidos por documentacion.',
+    'footer.tagline': 'El N8N de los Agentes IA. Orquesta equipos de agentes para cualquier proposito, definidos por documentacion.',
     'footer.github': 'GitHub',
     'footer.docs': 'Documentacion',
     'footer.roadmap': 'Hoja de Ruta',
@@ -114,6 +115,7 @@ export const ui: Record<Lang, Record<string, string>> = {
     'docs.webhooks': 'Webhooks',
     'docs.postActions': 'Post-Actions',
     'docs.mcp': 'Servidores MCP',
+    'docs.authentication': 'Autenticacion',
     'docs.architecture': 'Arquitectura',
   },
 };

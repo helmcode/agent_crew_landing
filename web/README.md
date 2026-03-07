@@ -1,8 +1,8 @@
 # AgentCrew
 
-**The Kubernetes of AI Agents.** Build, deploy, and orchestrate AI agent teams for any purpose.
+**The N8N of AI Agents.** Build, deploy, and orchestrate AI agent teams for any purpose.
 
-AgentCrew is an open-source AI agent orchestrator. Just as Kubernetes orchestrates containers regardless of what runs inside, AgentCrew orchestrates AI agents regardless of their purpose. Create teams for software engineering, marketing, finance, data analysis, content creation, operations, or anything else.
+AgentCrew is an open-source AI agent orchestrator. Just as N8N automates workflows regardless of the services involved, AgentCrew orchestrates AI agents regardless of their purpose. Create teams for software engineering, marketing, finance, data analysis, content creation, operations, or anything else.
 
 **Live site:** [agentcrew.helmcode.com](https://agentcrew.helmcode.com)
 
