@@ -28,9 +28,9 @@ import DocsLayout from '../../layouts/DocsLayout.astro';
     <pre><code class="language-bash">curl -fsSL https://agentcrew.helmcode.com/install.sh | bash</code></pre>
 
     <p>
-      The installer will check that Docker is available, ask for your
-      authentication credentials, generate all required configuration, and
-      start the stack automatically.
+      The installer will check that Docker is available, generate secure
+      authentication tokens (NATS, JWT, encryption key), and start the
+      stack automatically with local authentication enabled.
     </p>
 
     <p>
@@ -59,15 +59,22 @@ curl -fsSL -o docker-compose.yml \
     <h3>Step 2: Configure Environment Variables</h3>
 
     <p>
-      Create a <code>.env</code> file with a secure NATS token:
+      Create a <code>.env</code> file with the required tokens:
     </p>
 
-    <pre><code class="language-bash"># Generate .env with a random NATS token
-echo "NATS_AUTH_TOKEN=$(openssl rand -hex 16)" > .env</code></pre>
+    <pre><code class="language-bash"># Generate .env with secure random tokens
+cat > .env &lt;&lt;EOF
+NATS_AUTH_TOKEN=$(openssl rand -base64 24)
+AUTH_PROVIDER=local
+JWT_SECRET=$(openssl rand -base64 48)
+SETTINGS_ENCRYPTION_KEY=$(openssl rand -base64 32)
+MULTI_TENANT=false
+EOF</code></pre>
 
     <p>
       You can also set custom ports by adding <code>API_PORT</code> and
-      <code>FRONTEND_PORT</code> to the <code>.env</code> file.
+      <code>FRONTEND_PORT</code> to the <code>.env</code> file. For a
+      full list of options, see <a href="/docs/configuration">Configuration</a>.
     </p>
 
     <h3>Step 3: Start AgentCrew</h3>
@@ -82,7 +89,23 @@ echo "NATS_AUTH_TOKEN=$(openssl rand -hex 16)" > .env</code></pre>
 
     <pre><code class="language-text">http://localhost:8080</code></pre>
 
-    <h3>Step 5: Add Your Credentials</h3>
+    <h3>Step 5: Create Your Account</h3>
+
+    <p>
+      The first time you access AgentCrew, you will see the registration page.
+      Create your account by providing your name, email, password, and an
+      organization name. The first user automatically becomes the
+      <strong>admin</strong> of the organization.
+    </p>
+
+    <blockquote>
+      <strong>Note:</strong> With <code>MULTI_TENANT=false</code> (default),
+      only one organization can exist. Additional users must be invited by an
+      admin from the <strong>Organization Settings</strong> page.
+      See <a href="/docs/authentication">Authentication</a> for details.
+    </blockquote>
+
+    <h3>Step 6: Add Your Credentials</h3>
 
     <ol>
       <li>Click the <strong>Settings</strong> icon (gear) in the sidebar.</li>

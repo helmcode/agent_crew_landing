@@ -68,10 +68,12 @@ import DocsLayout from '../../layouts/DocsLayout.astro';
     </p>
 
     <ul>
+      <li><strong>Authentication and authorization:</strong> Built-in auth layer with JWT tokens, user management, organizations, and role-based access control (admin/member). See <a href="/docs/authentication">Authentication</a>.</li>
       <li>REST API endpoints for CRUD operations on teams, agents, and skills.</li>
       <li>Application settings management (API keys, configuration).</li>
       <li>Docker runtime management, including creating networks, volumes, and containers for each team.</li>
       <li>NATS message routing between the frontend and agent containers.</li>
+      <li>Multi-tenant data isolation: all queries are scoped to the user's organization.</li>
       <li>SQLite database access for persistent storage.</li>
     </ul>
 

@@ -1,0 +1,252 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+---
+
+<DocsLayout title="Authentication | AgentCrew" lang="en">
+  <div class="docs-prose">
+    <h1>Authentication</h1>
+
+    <p>
+      AgentCrew includes a built-in authentication system with user management,
+      organizations, invite-based onboarding, and role-based access control.
+      Authentication is configured via the <code>AUTH_PROVIDER</code> environment
+      variable and supports two modes: <strong>local</strong> (default) and
+      <strong>noop</strong>.
+    </p>
+
+    <h2>Authentication Modes</h2>
+
+    <h3>Local Authentication (default)</h3>
+
+    <p>
+      Set <code>AUTH_PROVIDER=local</code> to enable email/password authentication
+      with JWT tokens. This is the default mode when using the installer.
+    </p>
+
+    <ul>
+      <li>Users register with email, password, name, and organization name.</li>
+      <li>Passwords are hashed with <strong>bcrypt</strong> (cost factor 12).</li>
+      <li>JWT access tokens (default 24h) and refresh tokens (default 7d) are issued on login.</li>
+      <li>Tokens are signed with <strong>HMAC-SHA256</strong> using the <code>JWT_SECRET</code> environment variable.</li>
+      <li>The frontend automatically refreshes expired access tokens using the refresh token.</li>
+    </ul>
+
+    <p>
+      Required environment variables for local mode:
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Variable</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>JWT_SECRET</code></td>
+          <td>Secret for signing JWT tokens. Minimum 32 characters. Generate with <code>openssl rand -base64 48</code>.</td>
+        </tr>
+        <tr>
+          <td><code>SETTINGS_ENCRYPTION_KEY</code></td>
+          <td>Key for encrypting sensitive data (API keys, invite tokens) at rest using AES-256-GCM. Generate with <code>openssl rand -base64 32</code>.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Noop Authentication (no auth)</h3>
+
+    <p>
+      Set <code>AUTH_PROVIDER=noop</code> to disable authentication entirely. In
+      this mode:
+    </p>
+
+    <ul>
+      <li>No login screen is shown.</li>
+      <li>A default organization and user are created automatically.</li>
+      <li>All API requests are accepted without tokens.</li>
+      <li>Ideal for local development, testing, or single-user self-hosted setups where security is handled at the network level.</li>
+    </ul>
+
+    <blockquote>
+      <strong>Note:</strong> Switching from <code>noop</code> to <code>local</code>
+      is seamless. Existing data (teams, agents, settings) is automatically
+      associated with the default organization. You will just need to create
+      your first user account.
+    </blockquote>
+
+    <h2>Organizations</h2>
+
+    <p>
+      Every user belongs to an organization. Organizations provide <strong>data
+      isolation</strong>: teams, agents, schedules, webhooks, settings, and all
+      other resources are scoped to the organization. Users in one organization
+      cannot see or access resources from another.
+    </p>
+
+    <h3>Single-Tenant Mode (default)</h3>
+
+    <p>
+      With <code>MULTI_TENANT=false</code> (the default), only one organization
+      can exist. The first user who registers creates the organization and becomes
+      its admin. Additional users can only join via invite.
+    </p>
+
+    <h3>Multi-Tenant Mode</h3>
+
+    <p>
+      With <code>MULTI_TENANT=true</code>, anyone can register and create a new
+      organization. Each organization is fully isolated with its own users,
+      teams, settings, and data.
+    </p>
+
+    <h2>User Roles</h2>
+
+    <p>
+      AgentCrew uses a simple two-role model:
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Role</th>
+          <th>Capabilities</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Admin</strong></td>
+          <td>Full access. Can manage organization settings, invite users, change roles, reset passwords, and remove members. The first user (organization creator) is always an admin and cannot be downgraded.</td>
+        </tr>
+        <tr>
+          <td><strong>Member</strong></td>
+          <td>Can create and manage teams, agents, schedules, webhooks, and settings. Cannot manage users or organization settings.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <blockquote>
+      <strong>Safety:</strong> The system enforces that at least one admin always
+      exists. The organization owner cannot be removed or downgraded.
+    </blockquote>
+
+    <h2>First-Time Setup</h2>
+
+    <ol>
+      <li>
+        <strong>Install AgentCrew</strong> using the
+        <a href="/docs/quick-start">Quick Start</a> guide. The installer
+        generates all required secrets automatically.
+      </li>
+      <li>
+        <strong>Open the UI</strong> at <code>http://localhost:8080</code>. You
+        will see the registration page.
+      </li>
+      <li>
+        <strong>Create your account</strong> with your name, email, password, and
+        organization name. This account becomes the organization admin.
+      </li>
+      <li>
+        <strong>Add API keys</strong> in Settings to start deploying agent teams.
+      </li>
+    </ol>
+
+    <h2>Inviting Users</h2>
+
+    <p>
+      Admins can invite new users from the <strong>Organization Settings</strong>
+      page:
+    </p>
+
+    <ol>
+      <li>Go to <strong>Organization Settings</strong> in the sidebar.</li>
+      <li>In the <strong>Invitations</strong> section, enter the email address and click <strong>Invite</strong>.</li>
+      <li>Copy the invite link from the listing and share it with the user.</li>
+      <li>The invited user opens the link, fills in their name and password, and joins the organization.</li>
+    </ol>
+
+    <p>
+      Invitations expire after <strong>7 days</strong>. Admins can cancel pending
+      invitations at any time. The system prevents duplicate invites: you cannot
+      invite an email that is already a member or has a pending invitation.
+    </p>
+
+    <h2>Password Management</h2>
+
+    <h3>Changing Your Password</h3>
+
+    <p>
+      Users can change their own password from their <strong>Profile</strong>
+      page. They must enter their current password and the new one. Passwords
+      must be at least 8 characters and include an uppercase letter, a lowercase
+      letter, and a digit.
+    </p>
+
+    <h3>Admin Password Reset</h3>
+
+    <p>
+      Admins can reset any member's password from the Organization Settings page.
+      When reset, a temporary password is generated and displayed. The user must
+      change it on their next login (a forced password change screen is shown).
+    </p>
+
+    <h2>WebSocket Authentication</h2>
+
+    <p>
+      Real-time chat connections use WebSocket. Since WebSocket does not support
+      custom headers, the JWT token is passed as a query parameter:
+    </p>
+
+    <pre><code class="language-text">ws://localhost:8080/api/ws/team/&lt;team-id&gt;?token=&lt;jwt-access-token&gt;</code></pre>
+
+    <p>
+      The API server validates the token before upgrading the connection. In
+      <code>noop</code> mode, no token is required.
+    </p>
+
+    <h2>Security Details</h2>
+
+    <ul>
+      <li><strong>Password hashing:</strong> bcrypt with cost factor 12.</li>
+      <li><strong>JWT signing:</strong> HMAC-SHA256. The <code>none</code> algorithm is explicitly blocked.</li>
+      <li><strong>Token types:</strong> Access and refresh tokens include a <code>type</code> claim to prevent cross-use.</li>
+      <li><strong>Invite tokens:</strong> 32 bytes from <code>crypto/rand</code>. A SHA-256 hash is stored in the database; the raw token is encrypted with AES-256-GCM for admin retrieval.</li>
+      <li><strong>Sensitive data at rest:</strong> API keys and settings values are encrypted with AES-256-GCM using <code>SETTINGS_ENCRYPTION_KEY</code>.</li>
+      <li><strong>Email normalization:</strong> All emails are lowercased and trimmed to prevent case-sensitivity issues.</li>
+      <li><strong>Data isolation:</strong> All database queries are scoped to the user's organization ID, enforced at the middleware level.</li>
+    </ul>
+
+    <h2>Disabling Authentication</h2>
+
+    <p>
+      To run AgentCrew without authentication (useful for local development or
+      trusted networks):
+    </p>
+
+    <pre><code class="language-bash"># In your .env file
+AUTH_PROVIDER=noop</code></pre>
+
+    <p>
+      In noop mode, <code>JWT_SECRET</code> and <code>SETTINGS_ENCRYPTION_KEY</code>
+      are not required. All API endpoints accept unauthenticated requests, and a
+      default user and organization are created automatically.
+    </p>
+
+    <h2>Next Steps</h2>
+
+    <ul>
+      <li>
+        <a href="/docs/configuration">Configuration</a>: Full list of
+        environment variables including auth settings.
+      </li>
+      <li>
+        <a href="/docs/architecture">Architecture</a>: How the auth layer
+        integrates with the API server and frontend.
+      </li>
+      <li>
+        <a href="/docs/quick-start">Quick Start</a>: Get AgentCrew running
+        with authentication in one command.
+      </li>
+    </ul>
+  </div>
+</DocsLayout>

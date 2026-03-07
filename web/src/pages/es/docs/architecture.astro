@@ -67,10 +67,12 @@ import DocsLayout from '../../../layouts/DocsLayout.astro';
     </p>
 
     <ul>
+      <li><strong>Autenticacion y autorizacion:</strong> Capa de autenticacion integrada con tokens JWT, gestion de usuarios, organizaciones y control de acceso basado en roles (admin/miembro). Ver <a href="/es/docs/authentication">Autenticacion</a>.</li>
       <li>Endpoints de API REST para operaciones CRUD en equipos, agentes y habilidades.</li>
       <li>Gestion de ajustes de la aplicacion (claves API, configuracion).</li>
       <li>Gestion del runtime de Docker, incluyendo la creacion de redes, volumenes y contenedores para cada equipo.</li>
       <li>Enrutamiento de mensajes NATS entre el frontend y los contenedores de agentes.</li>
+      <li>Aislamiento de datos multi-tenant: todas las consultas estan limitadas a la organizacion del usuario.</li>
       <li>Acceso a la base de datos SQLite para almacenamiento persistente.</li>
     </ul>
 

@@ -1,0 +1,263 @@
+---
+import DocsLayout from '../../../layouts/DocsLayout.astro';
+---
+
+<DocsLayout title="Autenticacion | AgentCrew" lang="es">
+  <div class="docs-prose">
+    <h1>Autenticacion</h1>
+
+    <p>
+      AgentCrew incluye un sistema de autenticacion integrado con gestion de
+      usuarios, organizaciones, incorporacion mediante invitaciones y control
+      de acceso basado en roles. La autenticacion se configura mediante la
+      variable de entorno <code>AUTH_PROVIDER</code> y soporta dos modos:
+      <strong>local</strong> (por defecto) y <strong>noop</strong>.
+    </p>
+
+    <h2>Modos de Autenticacion</h2>
+
+    <h3>Autenticacion Local (por defecto)</h3>
+
+    <p>
+      Establece <code>AUTH_PROVIDER=local</code> para habilitar la autenticacion
+      por email/contrasena con tokens JWT. Este es el modo por defecto cuando
+      se usa el instalador.
+    </p>
+
+    <ul>
+      <li>Los usuarios se registran con email, contrasena, nombre y nombre de organizacion.</li>
+      <li>Las contrasenas se hashean con <strong>bcrypt</strong> (factor de coste 12).</li>
+      <li>Se emiten tokens de acceso JWT (por defecto 24h) y tokens de refresco (por defecto 7d) al iniciar sesion.</li>
+      <li>Los tokens se firman con <strong>HMAC-SHA256</strong> usando la variable de entorno <code>JWT_SECRET</code>.</li>
+      <li>El frontend refresca automaticamente los tokens de acceso expirados usando el token de refresco.</li>
+    </ul>
+
+    <p>
+      Variables de entorno requeridas para el modo local:
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Variable</th>
+          <th>Descripcion</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>JWT_SECRET</code></td>
+          <td>Secreto para firmar tokens JWT. Minimo 32 caracteres. Generar con <code>openssl rand -base64 48</code>.</td>
+        </tr>
+        <tr>
+          <td><code>SETTINGS_ENCRYPTION_KEY</code></td>
+          <td>Clave para cifrar datos sensibles (claves API, tokens de invitacion) en reposo usando AES-256-GCM. Generar con <code>openssl rand -base64 32</code>.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Autenticacion Noop (sin auth)</h3>
+
+    <p>
+      Establece <code>AUTH_PROVIDER=noop</code> para desactivar completamente la
+      autenticacion. En este modo:
+    </p>
+
+    <ul>
+      <li>No se muestra pantalla de login.</li>
+      <li>Se crean automaticamente una organizacion y un usuario por defecto.</li>
+      <li>Todas las peticiones a la API se aceptan sin tokens.</li>
+      <li>Ideal para desarrollo local, pruebas o configuraciones auto-alojadas de un solo usuario donde la seguridad se maneja a nivel de red.</li>
+    </ul>
+
+    <blockquote>
+      <strong>Nota:</strong> Cambiar de <code>noop</code> a <code>local</code>
+      es transparente. Los datos existentes (equipos, agentes, configuracion) se
+      asocian automaticamente con la organizacion por defecto. Solo necesitaras
+      crear tu primera cuenta de usuario.
+    </blockquote>
+
+    <h2>Organizaciones</h2>
+
+    <p>
+      Cada usuario pertenece a una organizacion. Las organizaciones proporcionan
+      <strong>aislamiento de datos</strong>: equipos, agentes, tareas programadas,
+      webhooks, configuracion y todos los demas recursos estan limitados a la
+      organizacion. Los usuarios de una organizacion no pueden ver ni acceder a
+      recursos de otra.
+    </p>
+
+    <h3>Modo Single-Tenant (por defecto)</h3>
+
+    <p>
+      Con <code>MULTI_TENANT=false</code> (el valor por defecto), solo puede
+      existir una organizacion. El primer usuario que se registra crea la
+      organizacion y se convierte en su administrador. Los usuarios adicionales
+      solo pueden unirse mediante invitacion.
+    </p>
+
+    <h3>Modo Multi-Tenant</h3>
+
+    <p>
+      Con <code>MULTI_TENANT=true</code>, cualquiera puede registrarse y crear
+      una nueva organizacion. Cada organizacion esta completamente aislada con
+      sus propios usuarios, equipos, configuracion y datos.
+    </p>
+
+    <h2>Roles de Usuario</h2>
+
+    <p>
+      AgentCrew usa un modelo simple de dos roles:
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Rol</th>
+          <th>Capacidades</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Admin</strong></td>
+          <td>Acceso completo. Puede gestionar configuracion de la organizacion, invitar usuarios, cambiar roles, restablecer contrasenas y eliminar miembros. El primer usuario (creador de la organizacion) siempre es administrador y no puede ser degradado.</td>
+        </tr>
+        <tr>
+          <td><strong>Miembro</strong></td>
+          <td>Puede crear y gestionar equipos, agentes, tareas programadas, webhooks y configuracion. No puede gestionar usuarios ni la configuracion de la organizacion.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <blockquote>
+      <strong>Seguridad:</strong> El sistema garantiza que siempre exista al
+      menos un administrador. El propietario de la organizacion no puede ser
+      eliminado ni degradado.
+    </blockquote>
+
+    <h2>Configuracion Inicial</h2>
+
+    <ol>
+      <li>
+        <strong>Instala AgentCrew</strong> usando la guia de
+        <a href="/es/docs/quick-start">Inicio Rapido</a>. El instalador
+        genera todos los secretos necesarios automaticamente.
+      </li>
+      <li>
+        <strong>Abre la interfaz</strong> en <code>http://localhost:8080</code>.
+        Veras la pagina de registro.
+      </li>
+      <li>
+        <strong>Crea tu cuenta</strong> con tu nombre, correo, contrasena y
+        nombre de organizacion. Esta cuenta se convierte en el administrador
+        de la organizacion.
+      </li>
+      <li>
+        <strong>Agrega las claves API</strong> en Configuracion para comenzar
+        a desplegar equipos de agentes.
+      </li>
+    </ol>
+
+    <h2>Invitar Usuarios</h2>
+
+    <p>
+      Los administradores pueden invitar nuevos usuarios desde la pagina de
+      <strong>Configuracion de la Organizacion</strong>:
+    </p>
+
+    <ol>
+      <li>Ve a <strong>Configuracion de la Organizacion</strong> en la barra lateral.</li>
+      <li>En la seccion de <strong>Invitaciones</strong>, ingresa la direccion de correo y haz clic en <strong>Invitar</strong>.</li>
+      <li>Copia el enlace de invitacion desde el listado y compartelo con el usuario.</li>
+      <li>El usuario invitado abre el enlace, completa su nombre y contrasena, y se une a la organizacion.</li>
+    </ol>
+
+    <p>
+      Las invitaciones expiran despues de <strong>7 dias</strong>. Los administradores
+      pueden cancelar invitaciones pendientes en cualquier momento. El sistema
+      previene invitaciones duplicadas: no se puede invitar un correo que ya es
+      miembro o que tiene una invitacion pendiente.
+    </p>
+
+    <h2>Gestion de Contrasenas</h2>
+
+    <h3>Cambiar tu Contrasena</h3>
+
+    <p>
+      Los usuarios pueden cambiar su propia contrasena desde su pagina de
+      <strong>Perfil</strong>. Deben ingresar su contrasena actual y la nueva.
+      Las contrasenas deben tener al menos 8 caracteres e incluir una letra
+      mayuscula, una minuscula y un digito.
+    </p>
+
+    <h3>Restablecimiento de Contrasena por Admin</h3>
+
+    <p>
+      Los administradores pueden restablecer la contrasena de cualquier miembro
+      desde la pagina de Configuracion de la Organizacion. Al restablecer, se
+      genera una contrasena temporal que se muestra en pantalla. El usuario debe
+      cambiarla en su proximo inicio de sesion (se muestra una pantalla de cambio
+      de contrasena obligatorio).
+    </p>
+
+    <h2>Autenticacion WebSocket</h2>
+
+    <p>
+      Las conexiones de chat en tiempo real usan WebSocket. Como WebSocket no
+      soporta cabeceras personalizadas, el token JWT se pasa como parametro de
+      consulta:
+    </p>
+
+    <pre><code class="language-text">ws://localhost:8080/api/ws/team/&lt;team-id&gt;?token=&lt;jwt-access-token&gt;</code></pre>
+
+    <p>
+      El servidor API valida el token antes de aceptar la conexion. En modo
+      <code>noop</code>, no se requiere token.
+    </p>
+
+    <h2>Detalles de Seguridad</h2>
+
+    <ul>
+      <li><strong>Hashing de contrasenas:</strong> bcrypt con factor de coste 12.</li>
+      <li><strong>Firma JWT:</strong> HMAC-SHA256. El algoritmo <code>none</code> esta explicitamente bloqueado.</li>
+      <li><strong>Tipos de token:</strong> Los tokens de acceso y refresco incluyen un claim <code>type</code> para prevenir el uso cruzado.</li>
+      <li><strong>Tokens de invitacion:</strong> 32 bytes de <code>crypto/rand</code>. Se almacena un hash SHA-256 en la base de datos; el token original se cifra con AES-256-GCM para su recuperacion por administradores.</li>
+      <li><strong>Datos sensibles en reposo:</strong> Las claves API y valores de configuracion se cifran con AES-256-GCM usando <code>SETTINGS_ENCRYPTION_KEY</code>.</li>
+      <li><strong>Normalizacion de email:</strong> Todos los correos se convierten a minusculas y se recortan para prevenir problemas de distincion entre mayusculas y minusculas.</li>
+      <li><strong>Aislamiento de datos:</strong> Todas las consultas a la base de datos estan limitadas al ID de organizacion del usuario, aplicado a nivel de middleware.</li>
+    </ul>
+
+    <h2>Desactivar la Autenticacion</h2>
+
+    <p>
+      Para ejecutar AgentCrew sin autenticacion (util para desarrollo local o
+      redes de confianza):
+    </p>
+
+    <pre><code class="language-bash"># En tu archivo .env
+AUTH_PROVIDER=noop</code></pre>
+
+    <p>
+      En modo noop, <code>JWT_SECRET</code> y <code>SETTINGS_ENCRYPTION_KEY</code>
+      no son necesarios. Todos los endpoints de la API aceptan peticiones sin
+      autenticar, y se crean automaticamente un usuario y una organizacion por
+      defecto.
+    </p>
+
+    <h2>Siguientes Pasos</h2>
+
+    <ul>
+      <li>
+        <a href="/es/docs/configuration">Configuracion</a>: Lista completa de
+        variables de entorno incluyendo ajustes de autenticacion.
+      </li>
+      <li>
+        <a href="/es/docs/architecture">Arquitectura</a>: Como la capa de
+        autenticacion se integra con el servidor API y el frontend.
+      </li>
+      <li>
+        <a href="/es/docs/quick-start">Inicio Rapido</a>: Pon AgentCrew en
+        marcha con autenticacion en un solo comando.
+      </li>
+    </ul>
+  </div>
+</DocsLayout>

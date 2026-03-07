@@ -72,18 +72,68 @@ import DocsLayout from '../../layouts/DocsLayout.astro';
           <td><code>20</code></td>
           <td>Global maximum number of webhook executions that can run simultaneously. Excess triggers are queued. Can also be overridden per-webhook.</td>
         </tr>
+        <tr>
+          <td><code>AUTH_PROVIDER</code></td>
+          <td>No</td>
+          <td><code>local</code></td>
+          <td>Authentication mode. <code>local</code> enables email/password authentication with JWT tokens. <code>noop</code> disables authentication entirely (single-user, no login required). See <a href="/docs/authentication">Authentication</a>.</td>
+        </tr>
+        <tr>
+          <td><code>JWT_SECRET</code></td>
+          <td>Yes*</td>
+          <td>None</td>
+          <td>Secret key for signing JWT tokens. Must be at least 32 characters. Required when <code>AUTH_PROVIDER=local</code>. Generated automatically by the installer.</td>
+        </tr>
+        <tr>
+          <td><code>SETTINGS_ENCRYPTION_KEY</code></td>
+          <td>Yes*</td>
+          <td>None</td>
+          <td>Key for encrypting sensitive data at rest (API keys, invite tokens) using AES-256-GCM. Required when <code>AUTH_PROVIDER=local</code>. Generated automatically by the installer.</td>
+        </tr>
+        <tr>
+          <td><code>MULTI_TENANT</code></td>
+          <td>No</td>
+          <td><code>false</code></td>
+          <td>When <code>false</code>, only one organization can exist. When <code>true</code>, multiple organizations can register independently. See <a href="/docs/authentication">Authentication</a>.</td>
+        </tr>
+        <tr>
+          <td><code>JWT_ACCESS_EXPIRATION</code></td>
+          <td>No</td>
+          <td><code>24h</code></td>
+          <td>Lifetime of JWT access tokens. Accepts Go duration strings (e.g., <code>1h</code>, <code>30m</code>).</td>
+        </tr>
+        <tr>
+          <td><code>JWT_REFRESH_EXPIRATION</code></td>
+          <td>No</td>
+          <td><code>7d</code></td>
+          <td>Lifetime of JWT refresh tokens. Accepts Go duration strings (e.g., <code>7d</code>, <code>30d</code>).</td>
+        </tr>
       </tbody>
     </table>
+
+    <blockquote>
+      <strong>*</strong> <code>JWT_SECRET</code> and <code>SETTINGS_ENCRYPTION_KEY</code> are required only when using <code>AUTH_PROVIDER=local</code>. They are not needed with <code>AUTH_PROVIDER=noop</code>.
+    </blockquote>
 
     <h3>Example .env file</h3>
 
     <pre><code class="language-bash"># Required
 NATS_AUTH_TOKEN=a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6
 
+# Authentication (required for AUTH_PROVIDER=local)
+AUTH_PROVIDER=local
+JWT_SECRET=your-secure-random-string-at-least-32-characters
+SETTINGS_ENCRYPTION_KEY=your-secure-random-encryption-key
+MULTI_TENANT=false
+
 # Optional overrides
 API_PORT=3000
 FRONTEND_PORT=8080
 AGENT_IMAGE=ghcr.io/helmcode/agent_crew_agent:0.3.0
+
+# Optional: JWT token lifetimes
+# JWT_ACCESS_EXPIRATION=24h
+# JWT_REFRESH_EXPIRATION=7d
 
 # Scheduler settings
 SCHEDULE_TIMEOUT=1h
@@ -179,6 +229,10 @@ WEBHOOK_MAX_CONCURRENT=20</code></pre>
     <h2>Next Steps</h2>
 
     <ul>
+      <li>
+        <a href="/docs/authentication">Authentication</a>: User management,
+        organizations, invites, and role-based access control.
+      </li>
       <li>
         <a href="/docs/skills">Skills</a>: Extend agent capabilities with
         installable skills from GitHub.
