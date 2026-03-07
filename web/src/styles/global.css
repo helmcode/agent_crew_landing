@@ -39,6 +39,95 @@ body {
   box-shadow: 0 0 30px rgba(59, 130, 246, 0.55);
 }
 
+/* ===== Scroll-triggered animations ===== */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+.reveal-delay-4 { transition-delay: 0.4s; }
+.reveal-delay-5 { transition-delay: 0.5s; }
+
+/* Scale-in variant */
+.reveal-scale {
+  opacity: 0;
+  transform: scale(0.92);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-scale.visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ===== Typing cursor ===== */
+
+@keyframes blink-cursor {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.typing-cursor::after {
+  content: '|';
+  animation: blink-cursor 0.8s step-end infinite;
+  color: #60a5fa;
+  font-weight: 300;
+  margin-left: 2px;
+}
+
+/* ===== Architecture pulse ===== */
+
+@keyframes pulse-flow {
+  0% { opacity: 0; transform: translateX(-8px); }
+  50% { opacity: 1; }
+  100% { opacity: 0; transform: translateX(8px); }
+}
+
+.arch-pulse {
+  animation: pulse-flow 2s ease-in-out infinite;
+}
+
+.arch-pulse-delay-1 { animation-delay: 0.5s; }
+.arch-pulse-delay-2 { animation-delay: 1s; }
+.arch-pulse-delay-3 { animation-delay: 1.5s; }
+
+/* ===== Terminal typing ===== */
+
+@keyframes terminal-fade-in {
+  from { opacity: 0; transform: translateX(-4px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.terminal-line {
+  opacity: 0;
+  animation: terminal-fade-in 0.3s ease forwards;
+}
+
+/* ===== Floating animation for hero ===== */
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.float-animation {
+  animation: float 4s ease-in-out infinite;
+}
+
+.float-animation-delay { animation-delay: -2s; }
+
 /* ===== Docs prose styling ===== */
 
 .docs-prose h1 {

@@ -1,0 +1,120 @@
+---
+import { useTranslations } from '../i18n/utils';
+import type { Lang } from '../i18n/ui';
+
+interface Props { lang?: Lang; }
+const lang = Astro.props.lang ?? 'en';
+const t = useTranslations(lang);
+
+const useCases = [
+  {
+    // LinkedIn Content — pen/share icon, violet
+    icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>`,
+    color: '#a78bfa',
+    bg: 'rgba(167, 139, 250, 0.12)',
+    border: 'rgba(167, 139, 250, 0.35)',
+    title: t('useCases.uc1Title'),
+    description: t('useCases.uc1Desc'),
+    agents: t('useCases.uc1Agents'),
+    trigger: t('useCases.uc1Trigger'),
+    result: t('useCases.uc1Result'),
+  },
+  {
+    // Survey Moderator — shield/database icon, amber
+    icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v4M12 16h.01"/></svg>`,
+    color: '#fbbf24',
+    bg: 'rgba(251, 191, 36, 0.12)',
+    border: 'rgba(251, 191, 36, 0.35)',
+    title: t('useCases.uc2Title'),
+    description: t('useCases.uc2Desc'),
+    agents: t('useCases.uc2Agents'),
+    trigger: t('useCases.uc2Trigger'),
+    result: t('useCases.uc2Result'),
+  },
+  {
+    // AI QA Engineer — git-merge/code icon, green
+    icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M6 21V9a9 9 0 0 0 9 9"/></svg>`,
+    color: '#4ade80',
+    bg: 'rgba(34, 197, 94, 0.12)',
+    border: 'rgba(34, 197, 94, 0.35)',
+    title: t('useCases.uc3Title'),
+    description: t('useCases.uc3Desc'),
+    agents: t('useCases.uc3Agents'),
+    trigger: t('useCases.uc3Trigger'),
+    result: t('useCases.uc3Result'),
+  },
+];
+---
+
+<section id="use-cases" class="py-24 sm:py-32" style="background: linear-gradient(180deg, #0a0f1e 0%, #0f172a 50%, #0a0f1e 100%);">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Header -->
+    <div class="text-center mb-16 reveal">
+      <span class="text-xs font-semibold tracking-widest uppercase text-blue-400 mb-4 block">{t('useCases.label')}</span>
+      <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
+        {t('useCases.heading')} <span class="gradient-text">{t('useCases.headingGradient')}</span>
+      </h2>
+      <p class="text-lg text-slate-400 max-w-2xl mx-auto">
+        {t('useCases.subtitle')}
+      </p>
+    </div>
+
+    <!-- Use case cards -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {useCases.map((uc, index) => (
+        <div
+          class={`group relative p-8 rounded-2xl border bg-slate-900/50 hover:bg-slate-900 transition-all duration-300 overflow-hidden reveal reveal-delay-${index + 1}`}
+          style={`border-color: ${uc.border};`}
+        >
+          <!-- Background glow -->
+          <div class="absolute -top-10 -right-10 w-40 h-40 rounded-full opacity-0 group-hover:opacity-20 transition-opacity duration-500 blur-3xl pointer-events-none" style={`background-color: ${uc.color};`}></div>
+
+          <div class="relative z-10">
+            <!-- Icon -->
+            <div
+              class="w-14 h-14 rounded-xl flex items-center justify-center mb-5"
+              style={`background: ${uc.bg}; border: 1px solid ${uc.border}; color: ${uc.color};`}
+            >
+              <Fragment set:html={uc.icon} />
+            </div>
+
+            <!-- Title & Description -->
+            <h3 class="text-white font-bold text-xl mb-3">{uc.title}</h3>
+            <p class="text-slate-400 leading-relaxed mb-6 text-sm">{uc.description}</p>
+
+            <!-- Details -->
+            <div class="space-y-3">
+              <div class="flex items-start gap-3">
+                <div class="w-6 h-6 rounded flex items-center justify-center flex-shrink-0 mt-0.5" style={`background: ${uc.bg};`}>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={uc.color} stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                </div>
+                <div>
+                  <span class="text-slate-500 text-xs font-medium uppercase tracking-wider">{t('useCases.agentsLabel')}</span>
+                  <p class="text-slate-300 text-sm">{uc.agents}</p>
+                </div>
+              </div>
+              <div class="flex items-start gap-3">
+                <div class="w-6 h-6 rounded flex items-center justify-center flex-shrink-0 mt-0.5" style={`background: ${uc.bg};`}>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={uc.color} stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                </div>
+                <div>
+                  <span class="text-slate-500 text-xs font-medium uppercase tracking-wider">{t('useCases.triggerLabel')}</span>
+                  <p class="text-slate-300 text-sm">{uc.trigger}</p>
+                </div>
+              </div>
+              <div class="flex items-start gap-3">
+                <div class="w-6 h-6 rounded flex items-center justify-center flex-shrink-0 mt-0.5" style={`background: ${uc.bg};`}>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={uc.color} stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M8 12l2 2 4-4"/></svg>
+                </div>
+                <div>
+                  <span class="text-slate-500 text-xs font-medium uppercase tracking-wider">{t('useCases.resultLabel')}</span>
+                  <p class="text-slate-300 text-sm">{uc.result}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

@@ -14,6 +14,7 @@ export const ui: Record<Lang, Record<string, string>> = {
     'nav.howItWorks': 'How it works',
     'nav.docs': 'Docs',
     'nav.github': 'GitHub',
+    'nav.useCases': 'Use Cases',
     'nav.contact': 'Contact',
     'nav.getStarted': 'Get Started',
 
@@ -67,6 +68,7 @@ export const ui: Record<Lang, Record<string, string>> = {
     'nav.howItWorks': 'Como funciona',
     'nav.docs': 'Docs',
     'nav.github': 'GitHub',
+    'nav.useCases': 'Casos de Uso',
     'nav.contact': 'Contacto',
     'nav.getStarted': 'Comenzar',
 
