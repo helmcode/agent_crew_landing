@@ -5,7 +5,7 @@ services:
     command: ["--auth", "${NATS_AUTH_TOKEN}", "-m", "8222"]
 
   api:
-    image: ghcr.io/helmcode/agent_crew_api:0.3.0
+    image: ghcr.io/helmcode/agent_crew_api:0.3.1
     restart: unless-stopped
     user: root
     ports:
@@ -18,7 +18,6 @@ services:
       - NATS_URL=nats://nats:4222
       - NATS_AUTH_TOKEN=${NATS_AUTH_TOKEN}
       - DATABASE_PATH=/data/agentcrew.db
-      - AGENT_IMAGE=${AGENT_IMAGE:-ghcr.io/helmcode/agent_crew_agent:0.3.0}
       - SETTINGS_ENCRYPTION_KEY=${SETTINGS_ENCRYPTION_KEY}
       - AUTH_PROVIDER=${AUTH_PROVIDER:-local}
       - JWT_SECRET=${JWT_SECRET}

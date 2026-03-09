@@ -49,12 +49,6 @@ import DocsLayout from '../../layouts/DocsLayout.astro';
           <td>Port on which the frontend is served. Change this if port 8080 is already in use.</td>
         </tr>
         <tr>
-          <td><code>AGENT_IMAGE</code></td>
-          <td>No</td>
-          <td><code>ghcr.io/helmcode/agent_crew_agent:0.3.0</code></td>
-          <td>Docker image used for agent containers. Override this to use a custom or newer agent image.</td>
-        </tr>
-        <tr>
           <td><code>SCHEDULE_TIMEOUT</code></td>
           <td>No</td>
           <td><code>1h</code></td>
@@ -129,7 +123,6 @@ MULTI_TENANT=false
 # Optional overrides
 API_PORT=3000
 FRONTEND_PORT=8080
-AGENT_IMAGE=ghcr.io/helmcode/agent_crew_agent:0.3.0
 
 # Optional: JWT token lifetimes
 # JWT_ACCESS_EXPIRATION=24h
@@ -224,6 +217,59 @@ WEBHOOK_MAX_CONCURRENT=20</code></pre>
       <strong>Tip:</strong> Back up your database by copying it from the
       volume. Use <code>docker cp</code> or mount the volume to a temporary
       container to access the SQLite file.
+    </blockquote>
+
+    <h2 id="custom-agent-images">Custom Agent Images</h2>
+
+    <p>
+      AgentCrew lets you use custom Docker images for your agents. This is useful
+      when your agents need extra tools, libraries, or system dependencies beyond
+      what the default images provide.
+    </p>
+
+    <blockquote>
+      <strong>Important:</strong> Your custom image <strong>must</strong> be based on the
+      official AgentCrew agent images, as they contain the required sidecar binary
+      and CLI tools.
+    </blockquote>
+
+    <h3>Base Dockerfile for Claude Code Agent</h3>
+
+    <pre><code class="language-dockerfile">FROM ghcr.io/helmcode/agent_crew_agent:latest
+
+# Add your custom dependencies here
+# Example: Install Python packages
+RUN pip install pandas numpy
+
+# Example: Install system tools
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    postgresql-client \
+    redis-tools \
+    && rm -rf /var/lib/apt/lists/*</code></pre>
+
+    <h3>Base Dockerfile for OpenCode Agent</h3>
+
+    <pre><code class="language-dockerfile">FROM ghcr.io/helmcode/agent_crew_opencode_agent:latest
+
+# Add your custom dependencies here
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    your-tools-here \
+    && rm -rf /var/lib/apt/lists/*</code></pre>
+
+    <h3>How to Build and Use</h3>
+
+    <p>Build your custom image:</p>
+
+    <pre><code class="language-bash">docker build -t myregistry/my-custom-agent:latest .</code></pre>
+
+    <p>
+      Then in the AgentCrew UI, set <strong>Custom Agent Image</strong> to
+      <code>myregistry/my-custom-agent:latest</code> when creating or editing a team.
+    </p>
+
+    <blockquote>
+      <strong>Warning:</strong> Using an image that does not contain the AgentCrew
+      sidecar binary and agent CLI will cause deployment failures.
     </blockquote>
 
     <h2>Next Steps</h2>
