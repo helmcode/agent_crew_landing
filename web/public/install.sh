@@ -101,7 +101,40 @@ install() {
 
   # Create .env file (preserve existing to keep tokens)
   if [[ -f "$INSTALL_DIR/.env" ]]; then
-    info "Existing .env found, keeping current configuration."
+    info "Existing .env found, checking for missing variables..."
+    local updated=false
+
+    # Ensure AUTH_PROVIDER is set
+    if ! grep -q '^AUTH_PROVIDER=' "$INSTALL_DIR/.env"; then
+      echo "" >> "$INSTALL_DIR/.env"
+      echo "# Authentication (added by installer upgrade)" >> "$INSTALL_DIR/.env"
+      echo "AUTH_PROVIDER=local" >> "$INSTALL_DIR/.env"
+      updated=true
+    fi
+
+    # Ensure JWT_SECRET is set
+    if ! grep -q '^JWT_SECRET=' "$INSTALL_DIR/.env"; then
+      echo "JWT_SECRET=$JWT_SECRET" >> "$INSTALL_DIR/.env"
+      updated=true
+    fi
+
+    # Ensure SETTINGS_ENCRYPTION_KEY is set
+    if ! grep -q '^SETTINGS_ENCRYPTION_KEY=' "$INSTALL_DIR/.env"; then
+      echo "SETTINGS_ENCRYPTION_KEY=$ENCRYPTION_KEY" >> "$INSTALL_DIR/.env"
+      updated=true
+    fi
+
+    # Ensure MULTI_TENANT is set
+    if ! grep -q '^MULTI_TENANT=' "$INSTALL_DIR/.env"; then
+      echo "MULTI_TENANT=false" >> "$INSTALL_DIR/.env"
+      updated=true
+    fi
+
+    if [[ "$updated" == "true" ]]; then
+      success "Added missing auth variables to existing .env"
+    else
+      success "Existing .env has all required variables"
+    fi
   else
     info "Generating configuration..."
     {
