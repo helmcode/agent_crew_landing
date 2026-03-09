@@ -237,24 +237,47 @@ WEBHOOK_MAX_CONCURRENT=20</code></pre>
 
     <pre><code class="language-dockerfile">FROM ghcr.io/helmcode/agent_crew_agent:latest
 
-# Add your custom dependencies here
-# Example: Install Python packages
-RUN pip install pandas numpy
+# Switch to root to install system packages
+USER root
 
-# Example: Install system tools
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    postgresql-client \
-    redis-tools \
-    && rm -rf /var/lib/apt/lists/*</code></pre>
+# Install system-level dependencies
+RUN mkdir -p /var/lib/apt/lists/partial \
+    && apt-get update && apt-get install -y --no-install-recommends \
+    your-system-packages-here \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install user-level tools as agentcrew user (NOT as root)
+# RUN su agentcrew -c "npx playwright install chromium"
+
+# IMPORTANT: Switch back to agentcrew user
+USER agentcrew</code></pre>
 
     <h3>Dockerfile Base para Agente OpenCode</h3>
 
     <pre><code class="language-dockerfile">FROM ghcr.io/helmcode/agent_crew_opencode_agent:latest
 
-# Add your custom dependencies here
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    your-tools-here \
-    && rm -rf /var/lib/apt/lists/*</code></pre>
+USER root
+
+# Install system-level dependencies
+RUN mkdir -p /var/lib/apt/lists/partial \
+    && apt-get update && apt-get install -y --no-install-recommends \
+    your-system-packages-here \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install user-level tools as agentcrew user (NOT as root)
+# RUN su agentcrew -c "command-here"
+
+# IMPORTANT: Switch back to agentcrew user
+USER agentcrew</code></pre>
+
+    <blockquote>
+      <strong>Importante:</strong> Siempre termina tu Dockerfile con
+      <code>USER agentcrew</code>. La imagen base se ejecuta como el usuario
+      <code>agentcrew</code>, y dejar <code>USER root</code> hará que Claude Code
+      rechace el flag <code>--dangerously-skip-permissions</code>. Usa
+      <code>USER root</code> solo para instalaciones de paquetes del sistema,
+      luego cambia de vuelta.
+    </blockquote>
 
     <h3>Cómo Construir y Usar</h3>
 
