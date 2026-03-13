@@ -34,7 +34,7 @@ const steps = [
 ];
 ---
 
-<section id="how-it-works" class="py-16 sm:py-20" style="background-color: #0a0f1e;">
+<section id="how-it-works" class="py-16 sm:py-20" aria-label="How it works" style="background-color: #0a0f1e;">
   <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
     <!-- Header -->
     <div class="text-center mb-16 reveal">
@@ -57,7 +57,7 @@ const steps = [
           <div class={`relative flex flex-col items-center text-center group reveal reveal-delay-${index + 1}`}>
             <!-- Step number circle -->
             <div class="relative z-10 w-24 h-24 rounded-2xl flex flex-col items-center justify-center mb-6 transition-all duration-300 group-hover:scale-105" style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(139, 92, 246, 0.1)); border: 1px solid rgba(59, 130, 246, 0.3);">
-              <div style="color: #60a5fa; margin-bottom: 4px;">
+              <div style="color: #60a5fa; margin-bottom: 4px;" aria-hidden="true">
                 <Fragment set:html={step.icon} />
               </div>
               <span class="text-xs font-bold text-blue-400/70">{step.number}</span>
@@ -87,8 +87,10 @@ const steps = [
         muted
         loop
         playsinline
+        poster="/screenshots/app-team-builder.png"
         class="w-full rounded-2xl"
         style="background: #0a0f1e;"
+        aria-label="Demo of AgentCrew workflow"
       >
         <source src="/videos/workflow-demo.mp4" type="video/mp4" />
       </video>

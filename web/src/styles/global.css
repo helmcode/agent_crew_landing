@@ -298,3 +298,33 @@ body {
   border: 1px solid #334155;
   margin: 1.5rem 0;
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .reveal-scale,
+  .reveal-delay-1,
+  .reveal-delay-2,
+  .reveal-delay-3,
+  .reveal-delay-4 {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+    animation: none !important;
+  }
+
+  .typing-cursor {
+    animation: none !important;
+  }
+
+  .arch-pulse {
+    animation: none !important;
+  }
+
+  .float-animation {
+    animation: none !important;
+  }
+
+  video {
+    animation: none !important;
+  }
+}
