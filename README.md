@@ -2,7 +2,7 @@
 
 Landing page for [AgentCrew](https://github.com/helmcode/agent_crew) — an open-source platform to build, deploy, and monitor collaborative AI agent teams powered by Claude Code.
 
-**Live:** [agentcrew.helmcode.com](https://agentcrew.helmcode.com)
+**Live:** [agentcrew.sh](https://agentcrew.sh)
 
 ## Structure
 

@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # AgentCrew installer
-# Usage: curl -fsSL https://agentcrew.helmcode.com/install.sh | bash
+# Usage: curl -fsSL https://agentcrew.sh/install.sh | bash
 
 REPO_BASE="https://raw.githubusercontent.com/helmcode/agent_crew_landing/main"
 INSTALL_DIR="$HOME/.agentcrew"
@@ -200,7 +200,7 @@ summary() {
   echo "    docker compose down            # Stop"
   echo "    docker compose up -d           # Start"
   echo ""
-  echo -e "  ${BOLD}Docs:${NC} https://agentcrew.helmcode.com/docs"
+  echo -e "  ${BOLD}Docs:${NC} https://agentcrew.sh/docs"
   echo ""
 }
 

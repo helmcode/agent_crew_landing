@@ -25,7 +25,7 @@ const currentPath = Astro.url.pathname;
 
 const enPath = lang === 'en' ? currentPath : getLocalizedPath(currentPath, 'en');
 const esPath = lang === 'es' ? currentPath : getLocalizedPath(currentPath, 'es');
-const siteUrl = 'https://agentcrew.helmcode.com';
+const siteUrl = 'https://agentcrew.sh';
 
 interface NavItem {
   href: string;

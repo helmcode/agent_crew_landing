@@ -6,7 +6,7 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
   integrations: [],
   output: 'static',
-  site: 'https://agentcrew.helmcode.com',
+  site: 'https://agentcrew.sh',
 
   i18n: {
     defaultLocale: 'en',

@@ -4,12 +4,12 @@
 
 AgentCrew is an open-source AI agent orchestrator. Just as N8N automates workflows regardless of the services involved, AgentCrew orchestrates AI agents regardless of their purpose. Create teams for software engineering, marketing, finance, data analysis, content creation, operations, or anything else.
 
-**Live site:** [agentcrew.helmcode.com](https://agentcrew.helmcode.com)
+**Live site:** [agentcrew.sh](https://agentcrew.sh)
 
 ## Get Started
 
 ```bash
-curl -fsSL https://agentcrew.helmcode.com/install.sh | bash
+curl -fsSL https://agentcrew.sh/install.sh | bash
 ```
 
 One command. Docker required. Open `http://localhost:8080` and start building your first agent team.
@@ -31,8 +31,8 @@ One command. Docker required. Open `http://localhost:8080` and start building yo
 
 ## Links
 
-- [Documentation](https://agentcrew.helmcode.com/docs)
-- [Quick Start](https://agentcrew.helmcode.com/docs/quick-start)
+- [Documentation](https://agentcrew.sh/docs)
+- [Quick Start](https://agentcrew.sh/docs/quick-start)
 - [Project Roadmap](https://github.com/orgs/helmcode/projects/2/views/2)
 - [GitHub](https://github.com/helmcode/agent_crew_landing)
 

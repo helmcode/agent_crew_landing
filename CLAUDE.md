@@ -6,7 +6,7 @@ All conversations MUST be in Spanish. All code, commits, PRs, and documentation 
 
 ## Project
 
-Landing page for [AgentCrew](https://github.com/helmcode/agent_crew) — built with Astro and deployed to Cloudflare Pages at [agentcrew.helmcode.com](https://agentcrew.helmcode.com).
+Landing page for [AgentCrew](https://github.com/helmcode/agent_crew) — built with Astro and deployed to Cloudflare Pages at [agentcrew.sh](https://agentcrew.sh).
 
 Source code lives in `web/`. Deployments are automated via GitHub Actions on every push to `main` that modifies files under `web/`.
 
