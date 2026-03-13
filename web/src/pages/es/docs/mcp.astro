@@ -105,7 +105,11 @@ import DocsLayout from '../../../layouts/DocsLayout.astro';
     <h2>Monitoreo de estado MCP</h2>
 
     <p>
-      Cada servidor MCP muestra su estado en el modal de Settings:
+      Cada servidor MCP muestra su estado de runtime en el modal de Settings.
+      AgentCrew reporta el estado real de ejecucion de cada servidor MCP
+      parseando eventos de estado del proveedor de IA (eventos init de
+      Claude Code y eventos de runtime de OpenCode). Esto te da visibilidad
+      en tiempo real sobre si cada servidor inicio correctamente o fallo.
     </p>
 
     <table>
@@ -118,32 +122,34 @@ import DocsLayout from '../../../layouts/DocsLayout.astro';
       </thead>
       <tbody>
         <tr>
-          <td><strong>Configured</strong></td>
+          <td><strong>Running</strong></td>
           <td>Punto verde</td>
-          <td>La configuracion del servidor se escribio correctamente y paso los health checks.</td>
+          <td>El servidor MCP esta ejecutandose y disponible para los agentes. Confirmado por el runtime del proveedor de IA.</td>
         </tr>
         <tr>
-          <td><strong>Error</strong></td>
+          <td><strong>Failed</strong></td>
           <td>Punto rojo</td>
-          <td>El servidor fallo los health checks. Haz clic en la flecha para expandir los detalles del error.</td>
+          <td>El servidor MCP fallo al iniciar. Haz clic en la flecha para expandir los detalles del error reportados por el runtime.</td>
         </tr>
         <tr>
           <td><strong>Pending</strong></td>
           <td>Punto gris</td>
-          <td>El servidor esta esperando el estado del contenedor del agente.</td>
+          <td>El servidor esta esperando el estado de runtime del contenedor del agente. Este es el estado inicial antes de que el proveedor de IA reporte.</td>
         </tr>
       </tbody>
     </table>
 
     <p>
-      Cuando un servidor MCP tiene un error, los detalles del error son expandibles
-      directamente en la lista de servidores. Las causas comunes incluyen:
+      Cuando un servidor MCP tiene estado <strong>Failed</strong>, los
+      detalles del error son expandibles directamente en la lista de
+      servidores. Las causas comunes incluyen:
     </p>
 
     <ul>
       <li>Paquete no encontrado (nombre incorrecto del paquete npm/pip)</li>
       <li>Servidor remoto inalcanzable (URL incorrecta o problema de red)</li>
       <li>Comando no encontrado (binario no instalado en la imagen del agente)</li>
+      <li>Fallo de autenticacion (credenciales invalidas o tokens expirados)</li>
       <li>Timeout durante la descarga de dependencias</li>
     </ul>
 
