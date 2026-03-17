@@ -1,0 +1,15 @@
+name = "agentcrew-telemetry"
+main = "src/index.ts"
+compatibility_date = "2024-12-01"
+account_id = "38f9cd01dec7d1d1807eace23c4f00a4"
+
+routes = [
+  { pattern = "telemetry.agentcrew.sh", custom_domain = true }
+]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "agentcrew-telemetry"
+# Replace with actual ID after running: npx wrangler d1 create agentcrew-telemetry
+database_id = "ac686675-0cd0-4568-b9c5-0daa519d7671"
+migrations_dir = "migrations"

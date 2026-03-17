@@ -20,3 +20,6 @@ web/.playwright/
 
 # Cloudflare
 .wrangler/
+
+# Telemetry worker
+telemetry/node_modules/

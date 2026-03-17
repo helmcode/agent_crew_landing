@@ -6,6 +6,7 @@ set -euo pipefail
 
 REPO_BASE="https://raw.githubusercontent.com/helmcode/agent_crew_landing/main"
 INSTALL_DIR="$HOME/.agentcrew"
+TELEMETRY_URL="https://telemetry.agentcrew.sh/v1/event"
 
 # ── Colors ──────────────────────────────────────────────────────────
 RED='\033[0;31m'
@@ -34,6 +35,17 @@ info()    { echo -e "${BLUE}[INFO]${NC} $*"; }
 success() { echo -e "${GREEN}[OK]${NC}   $*"; }
 warn()    { echo -e "${YELLOW}[WARN]${NC} $*"; }
 fail()    { echo -e "${RED}[ERROR]${NC} $*"; exit 1; }
+
+# ── Telemetry (anonymous, opt-out: AGENTCREW_NO_TELEMETRY=1) ──────
+telemetry() {
+  [[ "${AGENTCREW_NO_TELEMETRY:-}" == "1" ]] && return
+  local event="$1"
+  curl -sf --max-time 3 \
+    -X POST "$TELEMETRY_URL" \
+    -H "Content-Type: application/json" \
+    -d "{\"event\":\"${event}\",\"os\":\"$(uname -s)\",\"arch\":\"$(uname -m)\"}" \
+    >/dev/null 2>&1 || true
+}
 
 # ── Preflight checks ───────────────────────────────────────────────
 check_dependencies() {
@@ -207,8 +219,10 @@ summary() {
 # ── Main ────────────────────────────────────────────────────────────
 main() {
   banner
+  telemetry "start"
   check_dependencies
   install
+  telemetry "complete"
   summary
 }
 
