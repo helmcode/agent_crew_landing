@@ -1,0 +1,214 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+---
+
+<DocsLayout title="Open Source Models | AgentCrew" lang="en">
+  <div class="docs-prose">
+    <h1>Open Source Models</h1>
+
+    <p>
+      AgentCrew includes built-in support for running open source models locally
+      via <a href="https://ollama.com" target="_blank" rel="noopener">Ollama</a>.
+      When you select <strong>Ollama</strong> as your model provider, AgentCrew
+      automatically manages the entire lifecycle: starting the Ollama container,
+      pulling models, warming them up, and stopping the container when no teams
+      need it anymore.
+    </p>
+
+    <p>
+      This means you can run AI agent teams entirely on your own hardware, with
+      no external API keys required and full data privacy.
+    </p>
+
+    <h2>How It Works</h2>
+
+    <h3>Shared Infrastructure</h3>
+
+    <p>
+      Unlike team containers (which are isolated per team), Ollama runs as
+      <strong>shared infrastructure</strong>. A single
+      <code>agentcrew-ollama</code> container serves all teams that use the
+      Ollama provider. This avoids duplicating large model files and reduces
+      resource usage.
+    </p>
+
+    <ul>
+      <li>
+        <strong>Reference counting</strong>: AgentCrew tracks how many teams are
+        using Ollama. The container starts when the first Ollama team deploys and
+        stops when the last one is removed.
+      </li>
+      <li>
+        <strong>Persistent storage</strong>: Downloaded models are stored in a
+        Docker volume (<code>agentcrew-ollama-models</code>) that persists even
+        when the container stops. Models only need to be downloaded once.
+      </li>
+      <li>
+        <strong>Multi-network</strong>: The Ollama container connects to each
+        team's Docker network, so agent containers can reach it via DNS
+        (<code>agentcrew-ollama:11434</code>).
+      </li>
+    </ul>
+
+    <h3>Automatic Lifecycle</h3>
+
+    <p>
+      When you deploy a team with the Ollama provider, AgentCrew automatically:
+    </p>
+
+    <ol>
+      <li>Starts the <code>agentcrew-ollama</code> container (or reuses it if already running).</li>
+      <li>Connects it to the team's Docker network.</li>
+      <li>Pulls the selected model (if not already downloaded).</li>
+      <li>Warms up the model by loading weights into RAM, avoiding cold-start delays on the first message.</li>
+      <li>Deploys the team's agent containers with <code>OLLAMA_BASE_URL</code> pre-configured.</li>
+    </ol>
+
+    <p>
+      When you stop a team, AgentCrew disconnects Ollama from that team's
+      network and decrements the reference count. If no other teams are using
+      Ollama, the container is stopped (but the volume with downloaded models
+      is preserved).
+    </p>
+
+    <h2>GPU Support</h2>
+
+    <p>
+      AgentCrew automatically detects NVIDIA GPUs on the host machine. If
+      <code>nvidia-smi</code> is found in the system PATH, GPU passthrough is
+      enabled for the Ollama container, giving models access to all available
+      GPUs for dramatically faster inference.
+    </p>
+
+    <p>
+      No manual configuration is needed. If a GPU is available, it will be used
+      automatically. You can verify GPU status via the
+      <a href="#status-endpoint">status endpoint</a>.
+    </p>
+
+    <h2>Using Ollama in AgentCrew</h2>
+
+    <h3>Creating a Team</h3>
+
+    <ol>
+      <li>In the team creation wizard, select <strong>OpenCode</strong> as the provider.</li>
+      <li>Choose <strong>Ollama</strong> as the model provider.</li>
+      <li>
+        Select a model for your agents. The default model is
+        <code>qwen3:4b</code>, but you can use any model available in the
+        <a href="https://ollama.com/library" target="_blank" rel="noopener">Ollama model library</a>.
+      </li>
+      <li>Configure your agents as usual. All agents in the team will use the selected Ollama model provider.</li>
+    </ol>
+
+    <h3>Model Format</h3>
+
+    <p>
+      When specifying agent models, use the <code>ollama/</code> prefix followed
+      by the model name and optional tag:
+    </p>
+
+    <ul>
+      <li><code>ollama/qwen3:4b</code></li>
+      <li><code>ollama/llama3.3:8b</code></li>
+      <li><code>ollama/codellama:13b</code></li>
+      <li><code>ollama/mistral:7b</code></li>
+      <li><code>ollama/devstral</code></li>
+    </ul>
+
+    <p>
+      You can also use <code>inherit</code> to let the agent use the team's
+      default model.
+    </p>
+
+    <h3>Model Provider Constraint</h3>
+
+    <p>
+      When a team's model provider is set to <strong>Ollama</strong>, all agents
+      in that team must use Ollama models. You cannot mix providers within a
+      single OpenCode team (e.g., one agent using Ollama and another using
+      OpenAI). This constraint ensures consistent runtime behavior since all
+      agents share the same container environment.
+    </p>
+
+    <p>
+      If you change the model provider on an existing team, all agent model
+      selections are automatically reset to <code>inherit</code>.
+    </p>
+
+    <h2 id="status-endpoint">Status Endpoint</h2>
+
+    <p>
+      You can check the current state of the Ollama infrastructure via the API:
+    </p>
+
+    <pre><code>GET /api/ollama/status</code></pre>
+
+    <p>Response example:</p>
+
+    <pre><code>{"{"}
+  "running": true,
+  "container_id": "abc123...",
+  "models_pulled": ["qwen3:4b", "codellama:13b"],
+  "ref_count": 2,
+  "gpu_available": true
+{"}"}</code></pre>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Field</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>running</code></td>
+          <td>Whether the Ollama container is currently running.</td>
+        </tr>
+        <tr>
+          <td><code>container_id</code></td>
+          <td>Docker container ID (empty if not running).</td>
+        </tr>
+        <tr>
+          <td><code>models_pulled</code></td>
+          <td>List of models already downloaded and available.</td>
+        </tr>
+        <tr>
+          <td><code>ref_count</code></td>
+          <td>Number of active teams using Ollama.</td>
+        </tr>
+        <tr>
+          <td><code>gpu_available</code></td>
+          <td>Whether NVIDIA GPU passthrough is available.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Requirements</h2>
+
+    <ul>
+      <li><strong>Docker</strong>: Ollama runs as a Docker container, so Docker must be available on the host.</li>
+      <li><strong>Disk space</strong>: Models range from ~2 GB (small 4B parameter models) to ~10+ GB (larger 13B+ models). The persistent volume stores all downloaded models.</li>
+      <li><strong>RAM</strong>: Models are loaded into RAM (or VRAM if GPU is available). Ensure your host has enough memory for the selected model size.</li>
+      <li><strong>GPU (optional)</strong>: NVIDIA GPU with <code>nvidia-smi</code> and the <a href="https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html" target="_blank" rel="noopener">NVIDIA Container Toolkit</a> installed for GPU acceleration.</li>
+    </ul>
+
+    <h2>Next Steps</h2>
+
+    <ul>
+      <li>
+        <a href="/docs/providers">Providers</a>: Learn about all supported
+        providers and how they compare.
+      </li>
+      <li>
+        <a href="/docs/configuration">Configuration</a>: Review environment
+        variables and application settings.
+      </li>
+      <li>
+        <a href="/docs/architecture">Architecture</a>: Understand how containers,
+        sidecars, and networking work together.
+      </li>
+    </ul>
+  </div>
+</DocsLayout>

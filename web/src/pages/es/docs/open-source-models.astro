@@ -1,0 +1,222 @@
+---
+import DocsLayout from '../../../layouts/DocsLayout.astro';
+---
+
+<DocsLayout title="Modelos Open Source | AgentCrew" lang="es">
+  <div class="docs-prose">
+    <h1>Modelos Open Source</h1>
+
+    <p>
+      AgentCrew incluye soporte integrado para ejecutar modelos open source
+      localmente a traves de <a href="https://ollama.com" target="_blank" rel="noopener">Ollama</a>.
+      Cuando seleccionas <strong>Ollama</strong> como proveedor de modelos,
+      AgentCrew gestiona automaticamente todo el ciclo de vida: iniciar el
+      contenedor de Ollama, descargar modelos, precalentarlos y detener el
+      contenedor cuando ningun equipo lo necesite.
+    </p>
+
+    <p>
+      Esto significa que puedes ejecutar equipos de agentes IA completamente en
+      tu propio hardware, sin necesidad de claves API externas y con total
+      privacidad de datos.
+    </p>
+
+    <h2>Como Funciona</h2>
+
+    <h3>Infraestructura Compartida</h3>
+
+    <p>
+      A diferencia de los contenedores de equipo (que estan aislados por equipo),
+      Ollama se ejecuta como <strong>infraestructura compartida</strong>. Un unico
+      contenedor <code>agentcrew-ollama</code> sirve a todos los equipos que usan
+      el proveedor Ollama. Esto evita duplicar archivos de modelos grandes y
+      reduce el uso de recursos.
+    </p>
+
+    <ul>
+      <li>
+        <strong>Conteo de referencias</strong>: AgentCrew rastrea cuantos equipos
+        estan usando Ollama. El contenedor se inicia cuando el primer equipo
+        Ollama se despliega y se detiene cuando el ultimo se elimina.
+      </li>
+      <li>
+        <strong>Almacenamiento persistente</strong>: Los modelos descargados se
+        almacenan en un volumen Docker (<code>agentcrew-ollama-models</code>) que
+        persiste incluso cuando el contenedor se detiene. Los modelos solo
+        necesitan descargarse una vez.
+      </li>
+      <li>
+        <strong>Multi-red</strong>: El contenedor de Ollama se conecta a la red
+        Docker de cada equipo, permitiendo que los contenedores de agentes lo
+        alcancen via DNS (<code>agentcrew-ollama:11434</code>).
+      </li>
+    </ul>
+
+    <h3>Ciclo de Vida Automatico</h3>
+
+    <p>
+      Cuando despliegas un equipo con el proveedor Ollama, AgentCrew
+      automaticamente:
+    </p>
+
+    <ol>
+      <li>Inicia el contenedor <code>agentcrew-ollama</code> (o lo reutiliza si ya esta en ejecucion).</li>
+      <li>Lo conecta a la red Docker del equipo.</li>
+      <li>Descarga el modelo seleccionado (si no esta descargado previamente).</li>
+      <li>Precalienta el modelo cargando los pesos en RAM, evitando retrasos de arranque en frio en el primer mensaje.</li>
+      <li>Despliega los contenedores de agentes del equipo con <code>OLLAMA_BASE_URL</code> preconfigurado.</li>
+    </ol>
+
+    <p>
+      Cuando detienes un equipo, AgentCrew desconecta Ollama de la red de ese
+      equipo y decrementa el conteo de referencias. Si ningun otro equipo esta
+      usando Ollama, el contenedor se detiene (pero el volumen con los modelos
+      descargados se preserva).
+    </p>
+
+    <h2>Soporte de GPU</h2>
+
+    <p>
+      AgentCrew detecta automaticamente GPUs NVIDIA en la maquina host. Si se
+      encuentra <code>nvidia-smi</code> en el PATH del sistema, se habilita el
+      passthrough de GPU para el contenedor de Ollama, dando a los modelos
+      acceso a todas las GPUs disponibles para una inferencia drasticamente
+      mas rapida.
+    </p>
+
+    <p>
+      No se necesita configuracion manual. Si hay una GPU disponible, se usara
+      automaticamente. Puedes verificar el estado de la GPU a traves del
+      <a href="#status-endpoint">endpoint de estado</a>.
+    </p>
+
+    <h2>Usando Ollama en AgentCrew</h2>
+
+    <h3>Creando un Equipo</h3>
+
+    <ol>
+      <li>En el asistente de creacion de equipos, selecciona <strong>OpenCode</strong> como proveedor.</li>
+      <li>Elige <strong>Ollama</strong> como proveedor de modelos.</li>
+      <li>
+        Selecciona un modelo para tus agentes. El modelo por defecto es
+        <code>qwen3:4b</code>, pero puedes usar cualquier modelo disponible en la
+        <a href="https://ollama.com/library" target="_blank" rel="noopener">biblioteca de modelos de Ollama</a>.
+      </li>
+      <li>Configura tus agentes como de costumbre. Todos los agentes del equipo usaran el proveedor de modelos Ollama seleccionado.</li>
+    </ol>
+
+    <h3>Formato de Modelos</h3>
+
+    <p>
+      Al especificar modelos de agentes, usa el prefijo <code>ollama/</code>
+      seguido del nombre del modelo y la etiqueta opcional:
+    </p>
+
+    <ul>
+      <li><code>ollama/qwen3:4b</code></li>
+      <li><code>ollama/llama3.3:8b</code></li>
+      <li><code>ollama/codellama:13b</code></li>
+      <li><code>ollama/mistral:7b</code></li>
+      <li><code>ollama/devstral</code></li>
+    </ul>
+
+    <p>
+      Tambien puedes usar <code>inherit</code> para que el agente use el modelo
+      por defecto del equipo.
+    </p>
+
+    <h3>Restriccion de Proveedor de Modelos</h3>
+
+    <p>
+      Cuando el proveedor de modelos de un equipo esta configurado como
+      <strong>Ollama</strong>, todos los agentes de ese equipo deben usar modelos
+      de Ollama. No puedes mezclar proveedores dentro de un mismo equipo
+      OpenCode (por ejemplo, un agente usando Ollama y otro usando OpenAI).
+      Esta restriccion garantiza un comportamiento consistente en tiempo de
+      ejecucion, ya que todos los agentes comparten el mismo entorno de
+      contenedor.
+    </p>
+
+    <p>
+      Si cambias el proveedor de modelos en un equipo existente, todas las
+      selecciones de modelo de los agentes se reinician automaticamente a
+      <code>inherit</code>.
+    </p>
+
+    <h2 id="status-endpoint">Endpoint de Estado</h2>
+
+    <p>
+      Puedes verificar el estado actual de la infraestructura de Ollama a
+      traves de la API:
+    </p>
+
+    <pre><code>GET /api/ollama/status</code></pre>
+
+    <p>Ejemplo de respuesta:</p>
+
+    <pre><code>{"{"}
+  "running": true,
+  "container_id": "abc123...",
+  "models_pulled": ["qwen3:4b", "codellama:13b"],
+  "ref_count": 2,
+  "gpu_available": true
+{"}"}</code></pre>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Campo</th>
+          <th>Descripcion</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>running</code></td>
+          <td>Si el contenedor de Ollama esta actualmente en ejecucion.</td>
+        </tr>
+        <tr>
+          <td><code>container_id</code></td>
+          <td>ID del contenedor Docker (vacio si no esta en ejecucion).</td>
+        </tr>
+        <tr>
+          <td><code>models_pulled</code></td>
+          <td>Lista de modelos ya descargados y disponibles.</td>
+        </tr>
+        <tr>
+          <td><code>ref_count</code></td>
+          <td>Numero de equipos activos usando Ollama.</td>
+        </tr>
+        <tr>
+          <td><code>gpu_available</code></td>
+          <td>Si el passthrough de GPU NVIDIA esta disponible.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Requisitos</h2>
+
+    <ul>
+      <li><strong>Docker</strong>: Ollama se ejecuta como contenedor Docker, por lo que Docker debe estar disponible en el host.</li>
+      <li><strong>Espacio en disco</strong>: Los modelos van desde ~2 GB (modelos pequenos de 4B parametros) hasta ~10+ GB (modelos grandes de 13B+ parametros). El volumen persistente almacena todos los modelos descargados.</li>
+      <li><strong>RAM</strong>: Los modelos se cargan en RAM (o VRAM si hay GPU disponible). Asegurate de que tu host tiene suficiente memoria para el tamano del modelo seleccionado.</li>
+      <li><strong>GPU (opcional)</strong>: GPU NVIDIA con <code>nvidia-smi</code> y el <a href="https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html" target="_blank" rel="noopener">NVIDIA Container Toolkit</a> instalado para aceleracion por GPU.</li>
+    </ul>
+
+    <h2>Siguientes Pasos</h2>
+
+    <ul>
+      <li>
+        <a href="/es/docs/providers">Proveedores</a>: Conoce todos los
+        proveedores soportados y como se comparan.
+      </li>
+      <li>
+        <a href="/es/docs/configuration">Configuracion</a>: Revisa las variables
+        de entorno y ajustes de la aplicacion.
+      </li>
+      <li>
+        <a href="/es/docs/architecture">Arquitectura</a>: Comprende como
+        funcionan juntos los contenedores, sidecars y redes.
+      </li>
+    </ul>
+  </div>
+</DocsLayout>
