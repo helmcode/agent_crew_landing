@@ -29,7 +29,7 @@ services:
       - agentcrew_db:/data
 
   frontend:
-    image: ghcr.io/helmcode/agent_crew:0.4.13
+    image: ghcr.io/helmcode/agent_crew:0.4.14
     restart: unless-stopped
     ports:
       - "${FRONTEND_PORT:-8080}:8080"
