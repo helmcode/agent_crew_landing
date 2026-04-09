@@ -63,6 +63,12 @@ export const ui: Record<Lang, Record<string, string>> = {
     'docs.mcp': 'MCP Servers',
     'docs.authentication': 'Authentication',
     'docs.architecture': 'Architecture',
+    'docs.copyCode': 'Copy',
+    'docs.copied': 'Copied!',
+    'docs.prevPage': 'Previous',
+    'docs.nextPage': 'Next',
+    'docs.sidebarMenuOpen': 'Menu',
+    'docs.sidebarMenuClose': 'Close',
   },
   es: {
     // Navbar
@@ -119,5 +125,11 @@ export const ui: Record<Lang, Record<string, string>> = {
     'docs.mcp': 'Servidores MCP',
     'docs.authentication': 'Autenticacion',
     'docs.architecture': 'Arquitectura',
+    'docs.copyCode': 'Copiar',
+    'docs.copied': '¡Copiado!',
+    'docs.prevPage': 'Anterior',
+    'docs.nextPage': 'Siguiente',
+    'docs.sidebarMenuOpen': 'Menu',
+    'docs.sidebarMenuClose': 'Cerrar',
   },
 };

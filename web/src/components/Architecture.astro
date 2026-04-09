@@ -28,13 +28,34 @@ const t = useTranslations(lang);
         loop
         playsinline
         poster="/screenshots/app-team-detail.png"
-        class="w-full rounded-2xl"
+        class="w-full rounded-2xl lazy-video-arch"
         style="background: #0a0f1e;"
         aria-label="AgentCrew architecture overview"
       >
-        <source src="/videos/architecture-flow.mp4" type="video/mp4" />
+        <source data-src="/videos/architecture-flow.mp4" type="video/mp4" />
       </video>
     </div>
+
+    <script>
+      const video = document.querySelector('.lazy-video-arch') as HTMLVideoElement | null;
+      if (video) {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            if (entries[0].isIntersecting) {
+              const source = video.querySelector('source[data-src]') as HTMLSourceElement | null;
+              if (source) {
+                source.src = source.dataset.src!;
+                video.load();
+                video.play().catch(() => {});
+              }
+              observer.disconnect();
+            }
+          },
+          { rootMargin: '200px' }
+        );
+        observer.observe(video);
+      }
+    </script>
 
     <!-- Supporting bullets -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-10 reveal">

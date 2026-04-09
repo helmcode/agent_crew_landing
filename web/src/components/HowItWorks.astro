@@ -88,12 +88,33 @@ const steps = [
         loop
         playsinline
         poster="/screenshots/app-team-builder.png"
-        class="w-full rounded-2xl"
+        class="w-full rounded-2xl lazy-video"
         style="background: #0a0f1e;"
         aria-label="Demo of AgentCrew workflow"
       >
-        <source src="/videos/workflow-demo.mp4" type="video/mp4" />
+        <source data-src="/videos/workflow-demo.mp4" type="video/mp4" />
       </video>
     </div>
   </div>
 </section>
+
+<script>
+  const video = document.querySelector('.lazy-video') as HTMLVideoElement | null;
+  if (video) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          const source = video.querySelector('source[data-src]') as HTMLSourceElement | null;
+          if (source) {
+            source.src = source.dataset.src!;
+            video.load();
+            video.play().catch(() => {});
+          }
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '200px' }
+    );
+    observer.observe(video);
+  }
+</script>

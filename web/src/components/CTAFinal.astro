@@ -41,8 +41,45 @@ const base = getBaseUrl(lang);
     <div class="max-w-2xl mx-auto mb-10 rounded-xl border border-slate-700/60 overflow-hidden" style="background-color: #0d1117;">
       <div class="px-5 py-4 font-mono text-sm flex items-center justify-between gap-4">
         <code class="text-slate-300 overflow-x-auto"><span class="text-green-400">$</span> curl -fsSL https://agentcrew.sh/install.sh | bash</code>
+        <button
+          id="copy-install-cmd"
+          aria-label="Copy install command"
+          class="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium text-slate-400 hover:text-white border border-slate-700 hover:border-slate-500 transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
+          style="background-color: rgba(255,255,255,0.04);"
+        >
+          <svg id="copy-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+          </svg>
+          <svg id="check-icon" class="hidden" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          <span id="copy-label">Copy</span>
+        </button>
       </div>
     </div>
+
+    <script>
+      const btn = document.getElementById('copy-install-cmd');
+      const copyIcon = document.getElementById('copy-icon');
+      const checkIcon = document.getElementById('check-icon');
+      const label = document.getElementById('copy-label');
+      btn?.addEventListener('click', async () => {
+        await navigator.clipboard.writeText('curl -fsSL https://agentcrew.sh/install.sh | bash');
+        copyIcon?.classList.add('hidden');
+        checkIcon?.classList.remove('hidden');
+        if (label) label.textContent = 'Copied!';
+        (btn as HTMLButtonElement).style.color = '#34d399';
+        (btn as HTMLButtonElement).style.borderColor = '#34d399';
+        setTimeout(() => {
+          copyIcon?.classList.remove('hidden');
+          checkIcon?.classList.add('hidden');
+          if (label) label.textContent = 'Copy';
+          (btn as HTMLButtonElement).style.color = '';
+          (btn as HTMLButtonElement).style.borderColor = '';
+        }, 2000);
+      });
+    </script>
 
     <!-- CTA Buttons -->
     <div class="flex flex-col sm:flex-row sm:flex-wrap items-center justify-center gap-4">
