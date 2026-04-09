@@ -16,8 +16,8 @@ test.describe('AgentCrew Landing Page', () => {
 
   test('should display features section', async ({ page }) => {
     const featuresSection = page.locator('#features');
-    await expect(featuresSection.getByRole('heading', { name: 'Create Teams' })).toBeVisible();
-    await expect(featuresSection.getByRole('heading', { name: 'Deploy Instantly' })).toBeVisible();
+    await expect(featuresSection.getByRole('heading', { name: 'Create Teams for Anything' })).toBeVisible();
+    await expect(featuresSection.getByRole('heading', { name: 'Leader + Workers' })).toBeVisible();
   });
 
   test('should display how it works section', async ({ page }) => {
